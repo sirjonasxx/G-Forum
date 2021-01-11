@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Forum</title>
+
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/content.css">
+
+    <link rel="stylesheet" href="css/forum_overview.css">
+
+
+<!--    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu+Condensed">-->
+<!--    <link href="https://db.onlinewebfonts.com/c/3549b18f20fd1f535e2e9810c957c3c7?family=Ubuntu+Habbo" rel="stylesheet" type="text/css"/>-->
+
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/script.js"></script>
+</head>
+<body>
+
+<div class="box">
+
+    <div class="header">
+        <div class="header_logo_container">
+            <div id="logo"></div>
+        </div>
+        <div class="header_banner">
+            <div id="info">
+                <div id="info_title_container"></div>
+                <div id="info_desc_container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick_links_container">
+        <div class="quick_links_item"><b>Quick Links:</b></div>
+        <div class="quick_links_item"><a id="overview_my_forums">My Forums</a></div>
+        <div class="quick_links_item"><a id="overview_most_active">Most Active Forums</a></div>
+        <div class="quick_links_item"><a id="overview_most_viewed">Most Viewed Forums</a></div>
+    </div>
+
+    <div class="content_container">
+        <div id="content_title"></div>
+
+        <div id="content_items">
+            <div id="content_items_container">
+                <div class="overview_item item_lightblue content_item">
+                    <div class="overview_item_logo">
+                        <img src="images/test_group1.png" alt="">
+                    </div>
+                    <div class="overview_item_info">
+                        <div class="oii_name clickable">Ultra Rare Trade Forum</div>
+                        <div class="oii_desc">Score 0, last message by Pectize 20 minutes ago</div>
+                    </div>
+                    <div class="overview_item_msgs clickable">
+                        <div class="oim_msgs">202520 messages</div>
+                        <div class="oim_unread">0 unread</div>
+                    </div>
+                </div>
+<!--                <div class="overview_item item_darkblue content_item"></div>-->
+<!--                <div class="overview_item item_lightblue content_item"></div>-->
+<!--                <div class="overview_item item_darkblue content_item"></div>-->
+<!--                <div class="overview_item item_lightblue content_item"></div>-->
+<!--                <div class="overview_item item_darkblue content_item"></div>-->
+<!--                <div class="overview_item item_lightblue content_item"></div>-->
+<!--                <div class="overview_item item_darkblue content_item"></div>-->
+<!--                <div class="overview_item item_lightblue content_item"></div>-->
+
+            </div>
+        </div>
+
+
+        <div id="content_buttons">
+            <div class="forumbtn largebtn greybtn">
+                <div id="return_or_mark_read_btn" class="innerbtn">Mark As Read</div>
+            </div>
+            <div class="btnspacing"></div>
+            <div class="invisible forumbtn largebtn bluebtn gdisabled">
+                <div id="add_btn" class="innerbtn">New Thread</div>
+            </div>
+            <div id="first_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#60;&#60;</div></div>
+            <div id="prev_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#60;</div></div>
+            <div id="paging_lbl">1 / 1</div>
+            <div id="next_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#62;</div></div>
+            <div id="last_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#62;&#62;</div></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+<script>
+    setOverview("my_forums")
+</script>
+
+
+</body>
+</html>
