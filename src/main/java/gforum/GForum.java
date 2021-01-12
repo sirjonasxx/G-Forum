@@ -5,10 +5,7 @@ import gearth.extensions.ExtensionInfo;
 import gearth.extensions.extra.harble.HashSupport;
 import gearth.protocol.HMessage;
 import gearth.ui.GEarthController;
-import gforum.entities.HCommentOverview;
-import gforum.entities.HForumOverview;
-import gforum.entities.HForumStats;
-import gforum.entities.HThreadOverview;
+import gforum.entities.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -71,6 +68,17 @@ public class GForum extends ExtensionForm {
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
+    }
+
+
+    private volatile boolean doOnce = true;
+    @Override
+    protected void onStartConnection() {
+        if (doOnce) {
+            doOnce = false;
+            gForumController.requestOverview(0);
+            HForumOverview.requestFirst(this, HForumOverviewType.MY_FORUMS, GForum.PAGESIZE);
+        }
     }
 
     private void onForumStats(HMessage hMessage) {

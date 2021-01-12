@@ -42,8 +42,6 @@ public class GForumController implements Initializable {
 
         webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                initialized = true;
-
                 JSObject window = (JSObject) webView.getEngine().executeScript("window");
                 window.setMember("app", gForum);
 
@@ -65,10 +63,6 @@ public class GForumController implements Initializable {
                     requestOverview(0);
                     HForumOverview.requestFirst(gForum, HForumOverviewType.MOST_VIEWED, GForum.PAGESIZE);
                 }, true);
-
-                requestOverview(0);
-                HForumOverview.requestFirst(gForum, HForumOverviewType.MY_FORUMS, GForum.PAGESIZE);
-
 
                 Element first_btn = webView.getEngine().getDocument().getElementById("first_btn");
                 Element prev_btn = webView.getEngine().getDocument().getElementById("prev_btn");
@@ -95,6 +89,15 @@ public class GForumController implements Initializable {
                     requestOverview(currentOverview.internalRank());
                     currentOverview.request(gForum, currentOverview.getMaxAmount() - currentOverview.getMaxAmount() % GForum.PAGESIZE, GForum.PAGESIZE);
                 }, true);
+
+
+                initialized = true;
+                if (currentOverview != null && currentOverview == currentForumOverview) {
+                    Platform.runLater(() -> {
+                        webView.getEngine().executeScript(String.format("setOverview(\"%s\")", currentForumOverview.getViewMode().toString().toLowerCase()));
+                        setOverview(currentOverview);
+                    });
+                }
             }
         });
 
@@ -108,8 +111,6 @@ public class GForumController implements Initializable {
 
 
     private void setOverview(HOverview overview) {
-        currentOverview = overview;
-
         Platform.runLater(() -> {
             Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
             WebUtils.clearElement(content_items_container);
@@ -164,11 +165,15 @@ public class GForumController implements Initializable {
         clearRequest();
         currentThreadOverview = null;
         currentCommentOverview = null;
+        currentForumOverview = forumOverview;
+        currentOverview = forumOverview;
 
-        Platform.runLater(() -> {
-            webView.getEngine().executeScript(String.format("setOverview(\"%s\")", forumOverview.getViewMode().toString().toLowerCase()));
-            setOverview(forumOverview);
-        });
+        if (initialized) {
+            Platform.runLater(() -> {
+                webView.getEngine().executeScript(String.format("setOverview(\"%s\")", forumOverview.getViewMode().toString().toLowerCase()));
+                setOverview(forumOverview);
+            });
+        }
     }
 
     public void setForumStats(HForumStats forumStats) {
@@ -179,10 +184,11 @@ public class GForumController implements Initializable {
         if (requestingOverview != 1 || currentForumStats == null) {
             return;
         }
+        threadOverview.setForumStats(currentForumStats);
         clearRequest();
         currentCommentOverview = null;
-
-//        currentOverview = threadOverview;
+        currentThreadOverview = threadOverview;
+        currentOverview = threadOverview;
 
     }
 

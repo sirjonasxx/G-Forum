@@ -11,6 +11,7 @@ public class HThreadOverview implements HOverview {
     private final long guildId;
     private final int startIndex;
     private final List<HThread> threads;
+    private HForumStats forumStats = null;
 
     public HThreadOverview(HPacket hPacket) {
         guildId = hPacket.readLong();
@@ -21,6 +22,10 @@ public class HThreadOverview implements HOverview {
         for (int i = 0; i < threadsSize; i++) {
             threads.add(new HThread(hPacket));
         }
+    }
+
+    public void setForumStats(HForumStats forumStats) {
+        this.forumStats = forumStats;
     }
 
     public long getGuildId() {
@@ -56,8 +61,7 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public int getMaxAmount() {
-        // TODO
-        return 0;
+        return forumStats.gethForum().getAmountThreads();
     }
 
     @Override

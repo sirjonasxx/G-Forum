@@ -54,6 +54,7 @@ public class HThread implements ContentItem {
         // sulake did an oopsie here
         if (hPacket.readInteger(hPacket.getReadIndex()) == 0
                 && hPacket.readUshort(hPacket.getReadIndex() + 4) == 7
+                && hPacket.getReadIndex() + 4 + 2 + 7 <= hPacket.getBytesLength()
                 && hPacket.readString(hPacket.getReadIndex() + 4).equals("unknown")) {
             adminId = 0;
             adminName = "unknown";

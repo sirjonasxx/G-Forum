@@ -1,7 +1,6 @@
 package gforum.entities;
 
 import gearth.protocol.HPacket;
-import gforum.Constants;
 import gforum.GForum;
 import gforum.webview.WebUtils;
 import netscape.javascript.JSObject;
@@ -15,7 +14,7 @@ public class HForum implements ContentItem {
     private final String guildDescription;
     private final String guildBadge;
 
-    private final int unknown1;
+    private final int amountThreads;
     private final int rating;
     private final int amountComments;
     private final int unreadComments;
@@ -32,7 +31,7 @@ public class HForum implements ContentItem {
         guildDescription = hPacket.readString();
         guildBadge = hPacket.readString();
 
-        unknown1 = hPacket.readInteger();
+        amountThreads = hPacket.readInteger();
         rating = hPacket.readInteger();
         amountComments = hPacket.readInteger();
         unreadComments = hPacket.readInteger();
@@ -59,8 +58,8 @@ public class HForum implements ContentItem {
         return guildBadge;
     }
 
-    public int getUnknown1() {
-        return unknown1;
+    public int getAmountThreads() {
+        return amountThreads;
     }
 
     public int getRating() {
