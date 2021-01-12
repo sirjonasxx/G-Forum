@@ -8,22 +8,22 @@ import java.util.List;
 
 public class HThreadOverview implements HOverview {
 
-    private final int guildId;
+    private final long guildId;
     private final int startIndex;
     private final List<HThread> threads;
 
     public HThreadOverview(HPacket hPacket) {
-        guildId = hPacket.readInteger();
+        guildId = hPacket.readLong();
         startIndex = hPacket.readInteger();
 
         threads = new ArrayList<>();
-        int threadsSize = hPacket.readInteger();
+        int threadsSize = hPacket.readShort();
         for (int i = 0; i < threadsSize; i++) {
             threads.add(new HThread(hPacket));
         }
     }
 
-    public int getGuildId() {
+    public long getGuildId() {
         return guildId;
     }
 

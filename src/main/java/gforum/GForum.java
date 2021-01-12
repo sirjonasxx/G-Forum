@@ -57,18 +57,20 @@ public class GForum extends ExtensionForm {
 
         gForumController = loader.getController();
         gForumController.setgForum(this);
-
-
         return this;
     }
 
     @Override
     protected void initExtension() {
         hashSupport = new HashSupport(this);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumList", this::onForumOverview);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumThreads", this::onThreadOverview);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumComments", this::onCommentOverview);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumData", this::onForumStats);
+//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumList", this::onForumOverview);
+//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumThreads", this::onThreadOverview);
+//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumComments", this::onCommentOverview);
+//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumData", this::onForumStats);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumsList", this::onForumOverview);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
     }
 
     private void onForumStats(HMessage hMessage) {

@@ -7,7 +7,7 @@ public class HThread implements ContentItem {
 
     private final int threadId;
 
-    private final int authorId;
+    private final long authorId;
     private final String authorName;
     private final String subject;
 
@@ -19,12 +19,12 @@ public class HThread implements ContentItem {
     private final int unreadComments;
 
     private final int lastCommentIndexInForum;
-    private final int lastCommentAuthorId;
+    private final long lastCommentAuthorId;
     private final String lastCommentAuthorName;
     private final int lastCommentPassedTime;
 
     private final HThreadState state;
-    private final int adminId;
+    private final long adminId;
     private final String adminName;
 
     private final int unknownThreadId;
@@ -32,7 +32,7 @@ public class HThread implements ContentItem {
     public HThread(HPacket hPacket) {
         threadId = hPacket.readInteger();
 
-        authorId = hPacket.readInteger();
+        authorId = hPacket.readLong();
         authorName = hPacket.readString();
         subject = hPacket.readString();
 
@@ -44,13 +44,25 @@ public class HThread implements ContentItem {
         unreadComments = hPacket.readInteger();
 
         lastCommentIndexInForum = hPacket.readInteger();
-        lastCommentAuthorId = hPacket.readInteger();
+        lastCommentAuthorId = hPacket.readLong();
         lastCommentAuthorName = hPacket.readString();
         lastCommentPassedTime = hPacket.readInteger();
 
-        state = HThreadState.fromValue(hPacket.readByte());
-        adminId = hPacket.readInteger();
-        adminName = hPacket.readString();
+        byte b = hPacket.readByte();
+        state = HThreadState.fromValue(b);
+
+        // sulake did an oopsie here
+        if (hPacket.readInteger(hPacket.getReadIndex()) == 0
+                && hPacket.readUshort(hPacket.getReadIndex() + 4) == 7
+                && hPacket.readString(hPacket.getReadIndex() + 4).equals("unknown")) {
+            adminId = 0;
+            adminName = "unknown";
+            hPacket.setReadIndex(hPacket.getReadIndex() + 4 + 2 + 7);
+        }
+        else {
+            adminId = hPacket.readLong();
+            adminName = hPacket.readString();
+        }
 
         unknownThreadId = hPacket.readInteger();
     }
@@ -59,7 +71,7 @@ public class HThread implements ContentItem {
         return threadId;
     }
 
-    public int getAuthorId() {
+    public long getAuthorId() {
         return authorId;
     }
 
@@ -95,7 +107,7 @@ public class HThread implements ContentItem {
         return lastCommentIndexInForum;
     }
 
-    public int getLastCommentAuthorId() {
+    public long getLastCommentAuthorId() {
         return lastCommentAuthorId;
     }
 
@@ -111,7 +123,7 @@ public class HThread implements ContentItem {
         return state;
     }
 
-    public int getAdminId() {
+    public long getAdminId() {
         return adminId;
     }
 

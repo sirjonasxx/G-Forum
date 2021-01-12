@@ -10,7 +10,7 @@ public class HForum implements ContentItem {
 
     private static final String BADGE_URL = "https://www.habbo.com/habbo-imaging/badge/%s.gif";
 
-    private final int guildId;
+    private final long guildId;
     private final String guildName;
     private final String guildDescription;
     private final String guildBadge;
@@ -21,13 +21,13 @@ public class HForum implements ContentItem {
     private final int unreadComments;
 
     private final int lastCommentIndexInForum;
-    private final int lastCommentUserId;
+    private final long lastCommentUserId;
     private final String lastCommentUserName;
     private final int lastCommentPassedTime;
 
 
     public HForum(HPacket hPacket) {
-        guildId = hPacket.readInteger();
+        guildId = hPacket.readLong();
         guildName = hPacket.readString();
         guildDescription = hPacket.readString();
         guildBadge = hPacket.readString();
@@ -38,12 +38,12 @@ public class HForum implements ContentItem {
         unreadComments = hPacket.readInteger();
 
         lastCommentIndexInForum = hPacket.readInteger();
-        lastCommentUserId = hPacket.readInteger();
+        lastCommentUserId = hPacket.readLong();
         lastCommentUserName = hPacket.readString();
         lastCommentPassedTime = hPacket.readInteger();
     }
 
-    public int getGuildId() {
+    public long getGuildId() {
         return guildId;
     }
 
@@ -79,7 +79,7 @@ public class HForum implements ContentItem {
         return lastCommentIndexInForum;
     }
 
-    public int getLastCommentUserId() {
+    public long getLastCommentUserId() {
         return lastCommentUserId;
     }
 
@@ -96,8 +96,10 @@ public class HForum implements ContentItem {
     private GForum gForum = null;
     public void onClick() {
         gForum.getController().requestOverview(1);
-        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMSTATS, guildId));
-        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_THREADOVERVIEW, guildId, 0, GForum.PAGESIZE));
+        gForum.getHashSupport().sendToServer("GetForumStats", (long)guildId);
+//        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMSTATS, guildId));
+        gForum.getHashSupport().sendToServer("GetForumThreads", (long)guildId, 0, GForum.PAGESIZE);
+//        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_THREADOVERVIEW, guildId, 0, GForum.PAGESIZE));
     }
 
     @Override

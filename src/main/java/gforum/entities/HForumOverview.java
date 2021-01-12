@@ -20,7 +20,7 @@ public class HForumOverview implements HOverview {
         startIndex = hPacket.readInteger();
 
         forums = new ArrayList<>();
-        int forumsPageSize = hPacket.readInteger();
+        int forumsPageSize = hPacket.readShort();
         for (int i = 0; i < forumsPageSize; i++) {
             forums.add(new HForum(hPacket));
         }
@@ -66,7 +66,8 @@ public class HForumOverview implements HOverview {
 
     @Override
     public void request(GForum gForum, int start, int amount) {
-        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMOVERVIEW, viewMode.getVal(), start, amount));
+        gForum.getHashSupport().sendToServer("GetForumsList", viewMode.getVal(), start, amount);
+//        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMOVERVIEW, viewMode.getVal(), start, amount));
     }
 
     @Override
@@ -85,6 +86,7 @@ public class HForumOverview implements HOverview {
 
 
     public static void requestFirst(GForum gForum, HForumOverviewType viewMode, int amount){
-        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMOVERVIEW, viewMode.getVal(), 0, amount));
+        gForum.getHashSupport().sendToServer("GetForumsList", viewMode.getVal(), 0, amount);
+//        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMOVERVIEW, viewMode.getVal(), 0, amount));
     }
 }
