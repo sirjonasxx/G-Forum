@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class GForum extends ExtensionForm {
 
 //        System.out.println(new File(GForum.class.getResource("gforum.fxml").toURI()).getPath());
 
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("webview/images/logo.png")));
         primaryStage.setTitle("G-Forum");
         primaryStage.setMinWidth(420);
         primaryStage.setMinHeight(500);
