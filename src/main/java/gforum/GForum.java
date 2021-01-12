@@ -4,6 +4,7 @@ import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
 import gearth.extensions.extra.harble.HashSupport;
 import gearth.protocol.HMessage;
+import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
 import gforum.entities.*;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 @ExtensionInfo(
         Title =  "G-Forum",
@@ -68,6 +71,31 @@ public class GForum extends ExtensionForm {
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThread", this::onForumThread);
+    }
+
+    // received after update
+    private void onForumThread(HMessage hMessage) {
+        HPacket hPacket = hMessage.getPacket();
+        long guild = hPacket.readLong();
+        HThread hThread = new HThread(hPacket);
+        if (getController().getCurrentForumStats().gethForum().getGuildId() == guild &&
+        getController().getCurrentOverview() instanceof HThreadOverview) {
+            HThreadOverview threadOverview = (HThreadOverview) getController().getCurrentOverview();
+            List<HThread> threads = threadOverview.getThreads();
+            boolean succes = false;
+            for (int i = 0; i < threads.size(); i++) {
+                HThread maybeThread = threads.get(i);
+                if (maybeThread.getThreadId() == hThread.getThreadId()) {
+                    threads.set(i, hThread);
+                    succes = true;
+                    break;
+                }
+            }
+            if (succes) {
+                gForumController.setOverview(threadOverview, false);
+            }
+        }
     }
 
 
@@ -88,6 +116,7 @@ public class GForum extends ExtensionForm {
 
     private void onCommentOverview(HMessage hMessage) {
         HCommentOverview commentOverview = new HCommentOverview(hMessage.getPacket());
+        commentOverview.setgForum(this);
     }
 
     private void onThreadOverview(HMessage hMessage) {

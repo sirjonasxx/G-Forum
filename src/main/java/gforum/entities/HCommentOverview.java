@@ -80,6 +80,11 @@ public class HCommentOverview implements HOverview {
     }
 
     @Override
+    public void onAdd(GForum gForum) {
+        // TODO
+    }
+
+    @Override
     public void request(GForum gForum, int start, int amount) {
         // TODO
     }

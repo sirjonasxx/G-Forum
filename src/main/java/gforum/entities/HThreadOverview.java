@@ -85,6 +85,11 @@ public class HThreadOverview implements HOverview {
         // TODO
     }
 
+    @Override
+    public void onAdd(GForum gForum) {
+        // TODO
+    }
+
     public List<HThread> getThreads() {
         return threads;
     }

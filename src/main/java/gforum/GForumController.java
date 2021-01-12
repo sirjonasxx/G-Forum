@@ -97,7 +97,7 @@ public class GForumController implements Initializable {
                 if (currentOverview != null && currentOverview == currentForumOverview) {
                     Platform.runLater(() -> {
                         webView.getEngine().executeScript(String.format("setOverview(\"%s\")", currentForumOverview.getViewMode().toString().toLowerCase()));
-                        setOverview(currentOverview);
+                        setOverview(currentOverview, true);
                     });
                 }
             }
@@ -112,7 +112,7 @@ public class GForumController implements Initializable {
     }
 
 
-    private void setOverview(HOverview overview) {
+    public void setOverview(HOverview overview, boolean scrollTop) {
         Platform.runLater(() -> {
             Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
             WebUtils.clearElement(content_items_container);
@@ -120,7 +120,9 @@ public class GForumController implements Initializable {
                 ContentItem contentItem = overview.getContentItem(i);
                 contentItem.addHtml(i, gForum);
             }
-            webView.getEngine().executeScript("document.getElementById('" + contentItemsContainer + "').scrollTop = 0");
+            if (scrollTop) {
+                webView.getEngine().executeScript("document.getElementById('" + contentItemsContainer + "').scrollTop = 0");
+            }
 
             Element first_btn = webView.getEngine().getDocument().getElementById("first_btn");
             Element prev_btn = webView.getEngine().getDocument().getElementById("prev_btn");
@@ -176,7 +178,7 @@ public class GForumController implements Initializable {
         if (initialized) {
             Platform.runLater(() -> {
                 webView.getEngine().executeScript(String.format("setOverview(\"%s\")", forumOverview.getViewMode().toString().toLowerCase()));
-                setOverview(forumOverview);
+                setOverview(forumOverview, true);
             });
         }
     }
@@ -202,7 +204,7 @@ public class GForumController implements Initializable {
                         WebUtils.escapeMessage(currentForumStats.gethForum().getGuildName()),
                         WebUtils.escapeMessage(currentForumStats.gethForum().getGuildDescription())
                 ));
-                setOverview(threadOverview);
+                setOverview(threadOverview, true);
             });
         }
     }
@@ -234,5 +236,17 @@ public class GForumController implements Initializable {
 
     public HOverview getCurrentOverview() {
         return currentOverview;
+    }
+
+    public HCommentOverview getCurrentCommentOverview() {
+        return currentCommentOverview;
+    }
+
+    public HForumOverview getCurrentForumOverview() {
+        return currentForumOverview;
+    }
+
+    public HThreadOverview getCurrentThreadOverview() {
+        return currentThreadOverview;
     }
 }

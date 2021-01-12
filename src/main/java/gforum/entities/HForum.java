@@ -5,6 +5,8 @@ import gforum.GForum;
 import gforum.webview.WebUtils;
 import netscape.javascript.JSObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class HForum implements ContentItem {
 
     public static final String BADGE_URL = "https://www.habbo.com/habbo-imaging/badge/%s.gif";
@@ -27,8 +29,8 @@ public class HForum implements ContentItem {
 
     public HForum(HPacket hPacket) {
         guildId = hPacket.readLong();
-        guildName = hPacket.readString();
-        guildDescription = hPacket.readString();
+        guildName = hPacket.readString(StandardCharsets.UTF_8);
+        guildDescription = hPacket.readString(StandardCharsets.UTF_8);
         guildBadge = hPacket.readString();
 
         amountThreads = hPacket.readInteger();
@@ -38,7 +40,7 @@ public class HForum implements ContentItem {
 
         lastCommentIndexInForum = hPacket.readInteger();
         lastCommentUserId = hPacket.readLong();
-        lastCommentUserName = hPacket.readString();
+        lastCommentUserName = hPacket.readString(StandardCharsets.UTF_8);
         lastCommentPassedTime = hPacket.readInteger();
     }
 

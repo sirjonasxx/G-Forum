@@ -1,7 +1,6 @@
 package gforum.entities;
 
 import gearth.protocol.HPacket;
-import gforum.Constants;
 import gforum.GForum;
 
 import java.util.ArrayList;
@@ -14,6 +13,9 @@ public class HForumOverview implements HOverview {
     private final int startIndex;
     private final List<HForum> forums;
 
+    private final int startOffset;
+    private final int maskAmount;
+
     public HForumOverview(HPacket hPacket) {
         viewMode = HForumOverviewType.fromValue(hPacket.readInteger());
         size = hPacket.readInteger();
@@ -24,6 +26,17 @@ public class HForumOverview implements HOverview {
         for (int i = 0; i < forumsPageSize; i++) {
             forums.add(new HForum(hPacket));
         }
+        startOffset = 0;
+        maskAmount = forums.size();
+    }
+
+    public HForumOverview(HForumOverviewType viewMode, int size, int startIndex, List<HForum> forums, int offset, int maskAmount) {
+        this.viewMode = viewMode;
+        this.size = size;
+        this.startIndex = startIndex;
+        this.forums = forums;
+        this.startOffset = offset;
+        this.maskAmount = maskAmount;
     }
 
     public HForumOverviewType getViewMode() {
@@ -56,12 +69,12 @@ public class HForumOverview implements HOverview {
 
     @Override
     public int getAmount() {
-        return getForums().size();
+        return maskAmount;
     }
 
     @Override
     public ContentItem getContentItem(int i) {
-        return getForums().get(i);
+        return getForums().get(startOffset + i);
     }
 
     @Override
@@ -77,6 +90,11 @@ public class HForumOverview implements HOverview {
 
     @Override
     public void onReturn(GForum gForum, HOverview parent) {
+        // TODO
+    }
+
+    @Override
+    public void onAdd(GForum gForum) {
         // TODO
     }
 

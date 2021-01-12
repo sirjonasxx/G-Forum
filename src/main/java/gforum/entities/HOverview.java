@@ -16,6 +16,7 @@ public interface HOverview {
     int getMaxAmount();
 
     void onReturn(GForum gForum, HOverview parent);
+    void onAdd(GForum gForum);
     void request(GForum gForum, int start, int amount);
 
     int internalRank();

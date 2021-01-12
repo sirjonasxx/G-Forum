@@ -3,6 +3,8 @@ package gforum.entities;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 
+import java.nio.charset.StandardCharsets;
+
 public class HComment implements ContentItem {
 
     private final int commentId;
@@ -23,13 +25,13 @@ public class HComment implements ContentItem {
         commentId = hPacket.readInteger();
         indexInThread = hPacket.readInteger();
         userId = hPacket.readInteger();
-        userName = hPacket.readString();
+        userName = hPacket.readString(StandardCharsets.UTF_8);
         look = hPacket.readString();
         passedTime = hPacket.readInteger();
-        message = hPacket.readString();
+        message = hPacket.readString(StandardCharsets.UTF_8);
         state = HThreadState.fromValue(hPacket.readByte());
         adminId = hPacket.readInteger();
-        adminName = hPacket.readString();
+        adminName = hPacket.readString(StandardCharsets.UTF_8);
         irrelevantId = hPacket.readInteger();
         authorPostCount = hPacket.readInteger();
     }

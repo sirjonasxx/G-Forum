@@ -53,8 +53,7 @@ public class WebUtils {
         return text
                 .replace("\n\r", "<br />")
                 .replace("\n", "<br />")
-                .replace("\r", "<br />")
-                .replace("'", "\\'");
+                .replace("\r", "<br />");
     }
 
     public static void clearElement(Element node) {

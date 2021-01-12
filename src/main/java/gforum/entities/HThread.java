@@ -5,6 +5,8 @@ import gforum.GForum;
 import gforum.webview.WebUtils;
 import netscape.javascript.JSObject;
 
+import java.nio.charset.StandardCharsets;
+
 public class HThread implements ContentItem {
 
     private final int threadId;
@@ -35,8 +37,8 @@ public class HThread implements ContentItem {
         threadId = hPacket.readInteger();
 
         authorId = hPacket.readLong();
-        authorName = hPacket.readString();
-        subject = hPacket.readString();
+        authorName = hPacket.readString(StandardCharsets.UTF_8);
+        subject = hPacket.readString(StandardCharsets.UTF_8);
 
         pinned = hPacket.readBoolean();
         locked = hPacket.readBoolean();
@@ -47,7 +49,7 @@ public class HThread implements ContentItem {
 
         lastCommentIndexInForum = hPacket.readInteger();
         lastCommentAuthorId = hPacket.readLong();
-        lastCommentAuthorName = hPacket.readString();
+        lastCommentAuthorName = hPacket.readString(StandardCharsets.UTF_8);
         lastCommentPassedTime = hPacket.readInteger();
 
         byte b = hPacket.readByte();
@@ -64,7 +66,7 @@ public class HThread implements ContentItem {
         }
         else {
             adminId = hPacket.readLong();
-            adminName = hPacket.readString();
+            adminName = hPacket.readString(StandardCharsets.UTF_8);
         }
 
         unknownThreadId = hPacket.readInteger();
@@ -140,9 +142,59 @@ public class HThread implements ContentItem {
 
 
 
-    private GForum gForum = null;
-    public void onClick() {
 
+
+    private GForum gForum = null;
+    private boolean hasPermissions() {
+        HForumStats hForumStats = gForum.getController().getCurrentForumStats();
+        boolean canModerate = hForumStats.getErrorModerate().equals("");
+        boolean staffHidden = state == HThreadState.HIDDEN_BY_STAFF;
+
+        return (canModerate && !staffHidden);
+    }
+
+    public void stickyClick() {
+        if (hasPermissions()) {
+            HForum forum = gForum.getController().getCurrentForumStats().gethForum();
+            gForum.getHashSupport().sendToServer("UpdateForumThread",
+                    forum.getGuildId(),
+                    threadId,
+                    !isPinned(),
+                    isLocked()
+            );
+        }
+    }
+
+    public void lockClick() {
+        if (hasPermissions()) {
+            HForum forum = gForum.getController().getCurrentForumStats().gethForum();
+            gForum.getHashSupport().sendToServer("UpdateForumThread",
+                    forum.getGuildId(),
+                    threadId,
+                    isPinned(),
+                    !isLocked()
+            );
+        }
+    }
+
+    public void hideClick() {
+        if (hasPermissions()) {
+            HForum forum = gForum.getController().getCurrentForumStats().gethForum();
+            gForum.getHashSupport().sendToServer("ModerateForumThread",
+                    forum.getGuildId(),
+                    threadId,
+                    state == HThreadState.HIDDEN_BY_ADMIN ? 1 : 10
+            );
+        }
+    }
+
+    public void report() {
+        System.out.println("report");
+        // TODO
+    }
+
+    public void onClick() {
+        System.out.println("click thread");
     }
 
     @Override
@@ -162,8 +214,8 @@ public class HThread implements ContentItem {
                 .append("<div class=\"thread_item ").append(staffHidden ? "item_red" : (adminHidden ? "item_grey" : (i % 2 == 0 ? "item_lightblue" : "item_darkblue"))).append(" content_item\">")
 
                 .append("<div class=\"thread_settings\">")
-                .append("<img ").append(canModerate && !staffHidden ? "class=\"clickable\" " : "").append("src=\"").append(locked && !staffHidden ? "images/threads/lock_closed.png" : (canModerate && !staffHidden ? "images/threads/lock_open.png" : "images/threads/placeholder.png")).append("\" alt=\"\">")
-                .append("<img ").append(canModerate && !staffHidden ? "class=\"clickable\" " : "").append("src=\"").append(pinned && !staffHidden ? "images/threads/sticky.png" : (canModerate && !staffHidden ? "images/threads/unsticky.png" : "images/threads/placeholder.png")).append("\" alt=\"\">")
+                .append("<img ").append(canModerate && !staffHidden ? ("onclick=\"" + id +".lockClick()\" class=\"clickable\" ") : "").append("src=\"").append(locked && !staffHidden ? "images/threads/lock_closed.png" : (canModerate && !staffHidden ? "images/threads/lock_open.png" : "images/threads/placeholder.png")).append("\" alt=\"\">")
+                .append("<img ").append(canModerate && !staffHidden ? ("onclick=\"" + id +".stickyClick()\" class=\"clickable\" ") : "").append("src=\"").append(pinned && !staffHidden ? "images/threads/sticky.png" : (canModerate && !staffHidden ? "images/threads/unsticky.png" : "images/threads/placeholder.png")).append("\" alt=\"\">")
                 .append("</div>")
 
                 .append("<div class=\"thread_info\">");
@@ -183,8 +235,8 @@ public class HThread implements ContentItem {
                 .append("</div>");
 
         htmlBuilder.append("<div class=\"thread_delete_report\">")
-                .append("<img ").append(canModerate && !staffHidden ? "class=\"clickable\" " : "").append("src=\"").append(canModerate && !staffHidden ? (adminHidden ? "images/threads/unhide.png": "images/threads/hide.png") : "images/threads/placeholder2.png").append("\" alt=\"\">")
-                .append("<img class=\"clickable\" src=\"images/threads/report.png\" alt=\"\">")
+                .append("<img ").append(canModerate && !staffHidden ? ("onclick=\"" + id +".hideClick()\" class=\"clickable\" ") : "").append("src=\"").append(canModerate && !staffHidden ? (adminHidden ? "images/threads/unhide.png": "images/threads/hide.png") : "images/threads/placeholder2.png").append("\" alt=\"\">")
+                .append("<img onclick=\"").append(id).append(".report()\" class=\"clickable\" src=\"images/threads/report.png\" alt=\"\">")
                 .append("</div>")
 
                 .append("</div>");
