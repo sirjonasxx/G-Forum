@@ -74,7 +74,15 @@ public class GForum extends ExtensionForm {
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThread", this::onForumThread);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "Notification", this::onNotification);
     }
+
+    private void onNotification(HMessage hMessage) {
+        if (hMessage.getPacket().readString().contains("forum")) {
+            hMessage.setBlocked(true);
+        }
+    }
+
 
     // received after update
     private void onForumThread(HMessage hMessage) {
