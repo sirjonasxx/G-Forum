@@ -41,6 +41,11 @@ public class HForumOverview implements HOverview {
     }
 
     @Override
+    public boolean addElementEnabled() {
+        return false;
+    }
+
+    @Override
     public String returnText() {
         return "Mark As Read";
     }
@@ -55,8 +60,8 @@ public class HForumOverview implements HOverview {
     }
 
     @Override
-    public List<? extends ContentItem> contentItems() {
-        return getForums();
+    public ContentItem getContentItem(int i) {
+        return getForums().get(i);
     }
 
     @Override

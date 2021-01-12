@@ -40,6 +40,11 @@ public class HThreadOverview implements HOverview {
     }
 
     @Override
+    public boolean addElementEnabled() {
+        return forumStats.getErrorStartThread().equals("");
+    }
+
+    @Override
     public String returnText() {
         return "Mark As Read";
     }
@@ -51,12 +56,12 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public int getAmount() {
-        return contentItems().size();
+        return getThreads().size();
     }
 
     @Override
-    public List<? extends ContentItem> contentItems() {
-        return getThreads();
+    public ContentItem getContentItem(int i) {
+        return getThreads().get(i);
     }
 
     @Override
@@ -66,7 +71,8 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public void request(GForum gForum, int start, int amount) {
-        // TODO
+        gForum.getHashSupport().sendToServer("GetForumThreads",
+                forumStats.gethForum().getGuildId(), start, amount);
     }
 
     @Override

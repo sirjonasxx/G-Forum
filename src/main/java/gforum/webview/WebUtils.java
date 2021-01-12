@@ -12,6 +12,26 @@ import java.util.stream.Collectors;
 
 public class WebUtils {
 
+
+    private static HashMap<String, String> entityMap = new HashMap<>();
+    static {
+        entityMap.put("&", "&amp;");
+        entityMap.put("<", "&lt;");
+        entityMap.put(">", "&gt;");
+        entityMap.put("\"", "&quot;");
+        entityMap.put("'", "&#39;");
+        entityMap.put("/", "&#x2F;");
+        entityMap.put("`", "&#x60;");
+        entityMap.put("=", "&#x3D;");
+    }
+
+    public static String escapeHtml(String s) {
+        for(String key : entityMap.keySet()) {
+            s = s.replace(key, entityMap.get(key));
+        }
+        return s;
+    }
+
     public static String elapsedTime(int time) {
         if (time < 60) return time + (time == 1 ? " second" : " seconds");
         time = time/60;
@@ -21,14 +41,15 @@ public class WebUtils {
         int days = time/24;
         if (days < 7) return days + (days == 1 ? " day" : " days");
         int weeks = days/7;
-        if (weeks < 4) return weeks + (weeks == 1 ? " week" : " weeks");
-        int months = days/30;
+        if (weeks < 6) return weeks + (weeks == 1 ? " week" : " weeks");
+        int months = days/31;
         if (months < 12) return months + (months == 1 ? " month" : " months");
         int years = days/365;
         return years + (years == 1 ? " year" : " years");
     }
 
     public static String escapeMessage(String text) {
+        text = escapeHtml(text);
         return text
                 .replace("\n\r", "<br />")
                 .replace("\n", "<br />")

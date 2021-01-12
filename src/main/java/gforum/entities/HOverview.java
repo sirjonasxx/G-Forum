@@ -6,11 +6,12 @@ import java.util.List;
 
 public interface HOverview {
     String addElementText();
+    boolean addElementEnabled();
     String returnText();
 
     int getStartIndex();
     int getAmount();
-    List<? extends ContentItem> contentItems();
+    ContentItem getContentItem(int i);
 
     int getMaxAmount();
 

@@ -13,6 +13,7 @@ public class HCommentOverview implements HOverview {
     private final int startIndex;
     private final List<HComment> comments;
 
+    private GForum gForum;
 
     public HCommentOverview(HPacket packet) {
         guildId = packet.readLong();
@@ -34,11 +35,18 @@ public class HCommentOverview implements HOverview {
         return threadId;
     }
 
-
+    public void setgForum(GForum gForum) {
+        this.gForum = gForum;
+    }
 
     @Override
     public String addElementText() {
         return "Reply";
+    }
+
+    @Override
+    public boolean addElementEnabled() {
+        return gForum.getController().getCurrentForumStats().getErrorPost().equals("");
     }
 
     @Override
@@ -52,12 +60,12 @@ public class HCommentOverview implements HOverview {
 
     @Override
     public int getAmount() {
-        return contentItems().size();
+        return getComments().size();
     }
 
     @Override
-    public List<? extends ContentItem> contentItems() {
-        return getComments();
+    public ContentItem getContentItem(int i) {
+        return getComments().get(i);
     }
 
     @Override

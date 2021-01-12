@@ -77,17 +77,19 @@ public class GForumController implements Initializable {
                 ((EventTarget) prev_btn).addEventListener("click", event -> {
                     if (prev_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
-                    currentOverview.request(gForum, currentOverview.getStartIndex() - currentOverview.getAmount(), GForum.PAGESIZE);
+                    currentOverview.request(gForum, currentOverview.getStartIndex() - GForum.PAGESIZE, GForum.PAGESIZE);
                 }, true);
                 ((EventTarget) next_btn).addEventListener("click", event -> {
                     if (next_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
-                    currentOverview.request(gForum, currentOverview.getStartIndex() + currentOverview.getAmount(), GForum.PAGESIZE);
+                    currentOverview.request(gForum, currentOverview.getStartIndex() + GForum.PAGESIZE, GForum.PAGESIZE);
                 }, true);
                 ((EventTarget) last_btn).addEventListener("click", event -> {
                     if (last_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
-                    currentOverview.request(gForum, currentOverview.getMaxAmount() - currentOverview.getMaxAmount() % GForum.PAGESIZE, GForum.PAGESIZE);
+                    int lastPageSize = currentOverview.getMaxAmount() % GForum.PAGESIZE;
+                    if (lastPageSize == 0) lastPageSize = GForum.PAGESIZE;
+                    currentOverview.request(gForum, currentOverview.getMaxAmount() - lastPageSize, GForum.PAGESIZE);
                 }, true);
 
 
@@ -114,8 +116,8 @@ public class GForumController implements Initializable {
         Platform.runLater(() -> {
             Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
             WebUtils.clearElement(content_items_container);
-            for (int i = 0; i < overview.contentItems().size(); i++) {
-                ContentItem contentItem = overview.contentItems().get(i);
+            for (int i = 0; i < overview.getAmount(); i++) {
+                ContentItem contentItem = overview.getContentItem(i);
                 contentItem.addHtml(i, gForum);
             }
             webView.getEngine().executeScript("document.getElementById('" + contentItemsContainer + "').scrollTop = 0");
@@ -130,7 +132,7 @@ public class GForumController implements Initializable {
             WebUtils.removeClass(last_btn, "gdisabled");
 
             boolean isLast = overview.getMaxAmount() <= overview.getAmount() + overview.getStartIndex();
-            boolean isFirst = overview.getStartIndex() < overview.getAmount();
+            boolean isFirst = overview.getStartIndex() < GForum.PAGESIZE;
             if (isLast) {
                 WebUtils.addClass(next_btn, "gdisabled");
                 WebUtils.addClass(last_btn, "gdisabled");
@@ -154,6 +156,9 @@ public class GForumController implements Initializable {
             if (overview.addElementText() == null) WebUtils.addClass((Element) add_btn.getParentNode(), "invisible");
             else webView.getEngine().executeScript("document.getElementById('add_btn').innerHTML = '" + overview.addElementText() + "';");
 
+
+            WebUtils.removeClass((Element) add_btn.getParentNode(), "gdisabled");
+            if (!overview.addElementEnabled()) WebUtils.addClass((Element) add_btn.getParentNode(), "gdisabled");
 
         });
     }
@@ -190,6 +195,16 @@ public class GForumController implements Initializable {
         currentThreadOverview = threadOverview;
         currentOverview = threadOverview;
 
+        if (initialized) {
+            Platform.runLater(() -> {
+                webView.getEngine().executeScript(String.format("setForum(\"%s\", \"%s\", \"%s\")",
+                        String.format(HForum.BADGE_URL, currentForumStats.gethForum().getGuildBadge()),
+                        WebUtils.escapeMessage(currentForumStats.gethForum().getGuildName()),
+                        WebUtils.escapeMessage(currentForumStats.gethForum().getGuildDescription())
+                ));
+                setOverview(threadOverview);
+            });
+        }
     }
 
 
@@ -211,5 +226,13 @@ public class GForumController implements Initializable {
 
     public String getContentItemsContainer() {
         return contentItemsContainer;
+    }
+
+    public HForumStats getCurrentForumStats() {
+        return currentForumStats;
+    }
+
+    public HOverview getCurrentOverview() {
+        return currentOverview;
     }
 }

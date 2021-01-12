@@ -7,7 +7,7 @@ import netscape.javascript.JSObject;
 
 public class HForum implements ContentItem {
 
-    private static final String BADGE_URL = "https://www.habbo.com/habbo-imaging/badge/%s.gif";
+    public static final String BADGE_URL = "https://www.habbo.com/habbo-imaging/badge/%s.gif";
 
     private final long guildId;
     private final String guildName;
@@ -95,9 +95,9 @@ public class HForum implements ContentItem {
     private GForum gForum = null;
     public void onClick() {
         gForum.getController().requestOverview(1);
-        gForum.getHashSupport().sendToServer("GetForumStats", (long)guildId);
+        gForum.getHashSupport().sendToServer("GetForumStats", guildId);
 //        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMSTATS, guildId));
-        gForum.getHashSupport().sendToServer("GetForumThreads", (long)guildId, 0, GForum.PAGESIZE);
+        gForum.getHashSupport().sendToServer("GetForumThreads", guildId, 0, GForum.PAGESIZE);
 //        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_THREADOVERVIEW, guildId, 0, GForum.PAGESIZE));
     }
 
@@ -116,8 +116,8 @@ public class HForum implements ContentItem {
                 .append("</div>")
 
                 .append("<div class=\"overview_item_info\">")
-                .append("<div onclick=\"").append(id).append(".onClick()\" class=\"oii_name clickable\">").append(bold ? "<b>" : "").append(guildName).append(bold ? "</b>" : "").append("</div>")
-                .append("<div class=\"oii_desc\">Score ").append(rating).append(", last message by ").append(lastCommentUserName).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago</div>")
+                .append("<div onclick=\"").append(id).append(".onClick()\" class=\"oii_name clickable\">").append(bold ? "<b>" : "").append(WebUtils.escapeMessage(guildName)).append(bold ? "</b>" : "").append("</div>")
+                .append("<div class=\"oii_desc\">Score ").append(rating).append(", last message by ").append(WebUtils.escapeMessage(lastCommentUserName)).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago</div>")
                 .append("</div>")
 
                 .append("<div onclick=\"").append(id).append(".onClick()\" class=\"overview_item_msgs clickable\">")
@@ -129,7 +129,7 @@ public class HForum implements ContentItem {
 
         String forum = htmlBuilder.toString();
         gForum.getController().getWebView().getEngine().executeScript(
-                "document.getElementById('" + gForum.getController().getContentItemsContainer() + "').innerHTML += '" + WebUtils.escapeMessage(forum) + "';");
+                "document.getElementById('" + gForum.getController().getContentItemsContainer() + "').innerHTML += '" + forum + "';");
 
         JSObject window = (JSObject) gForum.getController().getWebView().getEngine().executeScript("window");
         window.setMember(id, this);

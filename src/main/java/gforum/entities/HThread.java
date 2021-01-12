@@ -2,6 +2,8 @@ package gforum.entities;
 
 import gearth.protocol.HPacket;
 import gforum.GForum;
+import gforum.webview.WebUtils;
+import netscape.javascript.JSObject;
 
 public class HThread implements ContentItem {
 
@@ -15,7 +17,7 @@ public class HThread implements ContentItem {
     private final boolean locked;
 
     private final int passedTime;
-    private final int ammountComments;
+    private final int amountComments;
     private final int unreadComments;
 
     private final int lastCommentIndexInForum;
@@ -40,7 +42,7 @@ public class HThread implements ContentItem {
         locked = hPacket.readBoolean();
 
         passedTime = hPacket.readInteger();
-        ammountComments = hPacket.readInteger();
+        amountComments = hPacket.readInteger();
         unreadComments = hPacket.readInteger();
 
         lastCommentIndexInForum = hPacket.readInteger();
@@ -96,8 +98,8 @@ public class HThread implements ContentItem {
         return passedTime;
     }
 
-    public int getAmmountComments() {
-        return ammountComments;
+    public int getAmountComments() {
+        return amountComments;
     }
 
     public int getUnreadComments() {
@@ -136,9 +138,64 @@ public class HThread implements ContentItem {
         return unknownThreadId;
     }
 
+
+
+    private GForum gForum = null;
+    public void onClick() {
+
+    }
+
     @Override
     public void addHtml(int i, GForum gForum) {
+        this.gForum = gForum;
 
+        boolean bold = unreadComments > 0;
+        String id = "thread" + i + "_" + System.currentTimeMillis();
+
+        HForumStats hForumStats = gForum.getController().getCurrentForumStats();
+        boolean canModerate = hForumStats.getErrorModerate().equals("");
+        boolean staffHidden = state == HThreadState.HIDDEN_BY_STAFF;
+        boolean adminHidden = state == HThreadState.HIDDEN_BY_ADMIN;
+        boolean access = ((canModerate && adminHidden) || state == HThreadState.OPEN);
+
+        StringBuilder htmlBuilder = new StringBuilder()
+                .append("<div class=\"thread_item ").append(staffHidden ? "item_red" : (adminHidden ? "item_grey" : (i % 2 == 0 ? "item_lightblue" : "item_darkblue"))).append(" content_item\">")
+
+                .append("<div class=\"thread_settings\">")
+                .append("<img ").append(canModerate && !staffHidden ? "class=\"clickable\" " : "").append("src=\"").append(locked && !staffHidden ? "images/threads/lock_closed.png" : (canModerate && !staffHidden ? "images/threads/lock_open.png" : "images/threads/placeholder.png")).append("\" alt=\"\">")
+                .append("<img ").append(canModerate && !staffHidden ? "class=\"clickable\" " : "").append("src=\"").append(pinned && !staffHidden ? "images/threads/sticky.png" : (canModerate && !staffHidden ? "images/threads/unsticky.png" : "images/threads/placeholder.png")).append("\" alt=\"\">")
+                .append("</div>")
+
+                .append("<div class=\"thread_info\">");
+
+        if ((adminHidden && !canModerate) || staffHidden) {
+            htmlBuilder.append("<div class=\"oii_name\">").append("Thread hidden by ").append(adminHidden ? WebUtils.escapeMessage(adminName) : "Habbo Staff").append("</div>");
+        }
+        else {
+            htmlBuilder.append("<div onclick=\"").append(id).append(".onClick()\" class=\"oii_name clickable\">").append(bold ? "<b>" : "").append(WebUtils.escapeMessage(subject)).append(bold ? "</b>" : "").append("</div>");
+        }
+        htmlBuilder.append("<div class=\"oii_desc\">By ").append(WebUtils.escapeMessage(authorName)).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago, last message by ").append(WebUtils.escapeMessage(lastCommentAuthorName)).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago").append("</div>")
+                .append("</div>")
+
+                .append("<div onclick=\"").append(id).append(".onClick()\" class=\"thread_msgs clickable\">")
+                .append("<div class=\"oim_msgs\">").append(bold && access ? "<b>" : "").append(amountComments).append(" messages</div>").append(bold && access ? "</b>" : "")
+                .append("<div class=\"oim_unread\">").append(bold && access ? "<b>" : "").append(unreadComments).append(" unread</div>").append(bold && access ? "</b>" : "")
+                .append("</div>");
+
+        htmlBuilder.append("<div class=\"thread_delete_report\">")
+                .append("<img ").append(canModerate && !staffHidden ? "class=\"clickable\" " : "").append("src=\"").append(canModerate && !staffHidden ? (adminHidden ? "images/threads/unhide.png": "images/threads/hide.png") : "images/threads/placeholder2.png").append("\" alt=\"\">")
+                .append("<img class=\"clickable\" src=\"images/threads/report.png\" alt=\"\">")
+                .append("</div>")
+
+                .append("</div>");
+
+
+        String forum = htmlBuilder.toString();
+        gForum.getController().getWebView().getEngine().executeScript(
+                "document.getElementById('" + gForum.getController().getContentItemsContainer() + "').innerHTML += '" + forum + "';");
+
+        JSObject window = (JSObject) gForum.getController().getWebView().getEngine().executeScript("window");
+        window.setMember(id, this);
     }
 
 }
