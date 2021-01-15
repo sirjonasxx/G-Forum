@@ -92,6 +92,20 @@ public class GForumController implements Initializable {
                     currentOverview.request(gForum, currentOverview.getMaxAmount() - lastPageSize, GForum.PAGESIZE);
                 }, true);
 
+                Element return_or_mark_read_btn = webView.getEngine().getDocument().getElementById("return_or_mark_read_btn");
+                Element add_btn = webView.getEngine().getDocument().getElementById("add_btn");
+
+                ((EventTarget) return_or_mark_read_btn).addEventListener("click", event -> {
+                    if (currentOverview != null) {
+                        currentOverview.returnClick(gForum);
+                    }
+                }, true);
+
+                ((EventTarget) add_btn).addEventListener("click", event -> {
+                    if (currentOverview != null) {
+                        currentOverview.addClick(gForum);
+                    }
+                }, true);
 
                 initialized = true;
                 if (currentOverview != null && currentOverview == currentForumOverview) {

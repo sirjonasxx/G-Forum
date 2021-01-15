@@ -1,10 +1,14 @@
 package gforum.entities;
 
+import gearth.misc.harble_api.HarbleAPI;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class HForumOverview implements HOverview {
 
@@ -89,12 +93,35 @@ public class HForumOverview implements HOverview {
     }
 
     @Override
-    public void onReturn(GForum gForum, HOverview parent) {
-        // TODO
+    public void returnClick(GForum gForum) {
+        HarbleAPI.HarbleMessage harbleMessage = gForum.getHashSupport().getHarbleAPI().getHarbleMessageFromName(HMessage.Direction.TOSERVER, "UpdateForumReadMarkers");
+        HPacket markersUpdate = new HPacket(harbleMessage.getHeaderId());
+        List<HForum> readForums = forums.stream().filter(hForum -> hForum.getUnreadComments() > 0).collect(Collectors.toList());
+
+        markersUpdate.appendShort((short)readForums.size());
+        for(HForum hForum : readForums) {
+            markersUpdate.appendLong(hForum.getGuildId());
+            markersUpdate.appendInt(hForum.getLastCommentIndexInForum());
+            markersUpdate.appendBoolean(true);
+        }
+        gForum.sendToServer(markersUpdate);
+
+//        gForum.getHashSupport().sendToServer("UpdateForumReadMarkers", (short)1,  forums.get(0).getGuildId(),  forums.get(0).getLastCommentIndexInForum(), true);
+        gForum.getPrimaryStage().hide();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(100);
+                gForum.getController().requestOverview(0);
+                requestFirst(gForum, HForumOverviewType.MY_FORUMS, 20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @Override
-    public void onAdd(GForum gForum) {
+    public void addClick(GForum gForum) {
         // TODO
     }
 

@@ -81,12 +81,16 @@ public class HThreadOverview implements HOverview {
     }
 
     @Override
-    public void onReturn(GForum gForum, HOverview parent) {
-        // TODO
+    public void returnClick(GForum gForum) {
+
+        gForum.getHashSupport().sendToServer("UpdateForumReadMarkers",(short)1,  guildId,  forumStats.gethForum().getLastCommentIndexInForum(), false);
+        gForum.getController().requestOverview(0);
+        HForumOverview overview = gForum.getController().getCurrentForumOverview();
+        overview.request(gForum, overview.getStartIndex(), overview.getAmount());
     }
 
     @Override
-    public void onAdd(GForum gForum) {
+    public void addClick(GForum gForum) {
         // TODO
     }
 

@@ -1,0 +1,92 @@
+.comment_item {
+    flex: 0 0 auto;
+    background-color: #bab8b4;
+
+    width: 100%;
+
+
+    display: flex;
+    flex-flow: column;
+    /*overflow: scroll;*/
+}
+
+.comment_header {
+    flex: 0 0 auto;
+
+    min-height: 26px;
+    background-color: #3179ac;
+
+    display: flex;
+}
+
+.comment_body {
+    display: flex;
+    min-height: 100px;
+}
+
+
+
+
+.ch_timeago {
+    flex: 1 1 auto;
+    color: white;
+    font-size: 13px;
+    margin: 5px 0 0 4px;
+}
+.ch_index {
+    flex: 0 0 auto;
+    color: white;
+    font-size: 13px;
+    margin: 5px 4px 0 0;
+}
+.ch_buttons {
+    flex: 0 0 auto;
+    display: flex;
+}
+
+
+
+
+.cb_author {
+    flex: 0 1 auto;
+    min-width: 130px;
+    max-width: 130px;
+    background-color: #c8eff8;
+
+    display: flex;
+    flex-flow: column;
+}
+
+.cb_content, .cb_content > div {
+    flex: 1 1 auto;
+    background-color: #ffffff;
+
+    padding: 5px 10px;
+    font-size: 13px;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+
+
+.cba_name {
+    flex: 0 0 auto;
+
+    min-height: 18px;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 6px 0 0 5px;
+
+}
+.cba_messages {
+    flex: 0 0 auto;
+
+    min-height: 17px;
+    font-size: 13px;
+    margin: 0 0 0 5px;
+
+}
+.cba_look {
+    margin: -17px 0 0 -7px;
+    height: 0;
+}

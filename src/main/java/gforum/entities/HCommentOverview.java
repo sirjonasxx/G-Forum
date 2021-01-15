@@ -75,12 +75,12 @@ public class HCommentOverview implements HOverview {
     }
 
     @Override
-    public void onReturn(GForum gForum, HOverview parent) {
+    public void returnClick(GForum gForum) {
         // TODO
     }
 
     @Override
-    public void onAdd(GForum gForum) {
+    public void addClick(GForum gForum) {
         // TODO
     }
 

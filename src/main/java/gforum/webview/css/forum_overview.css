@@ -25,7 +25,7 @@
 
     margin-left: 3px;
 
-    margin-top: 2px;
+    margin-top: 0;
 }
 
 .overview_item_msgs {
@@ -40,12 +40,12 @@
 
 .oii_name {
     font-size: 13px;
-    margin-top: 1px;
     width: 100%;
 
     overflow: hidden;
     max-height: 14px;
     min-height: 14px;
+    padding-top: 3px;
 }
 .oii_desc {
     font-size: 11px;
@@ -55,7 +55,7 @@
 
 .oim_msgs {
     font-size: 11px;
-    margin-top: 2px;
+    margin-top: 3px;
 }
 .oim_unread {
     font-size: 11px;

@@ -226,7 +226,7 @@ public class HThread implements ContentItem {
         else {
             htmlBuilder.append("<div onclick=\"").append(id).append(".onClick()\" class=\"oii_name clickable\">").append(bold ? "<b>" : "").append(WebUtils.escapeMessage(subject)).append(bold ? "</b>" : "").append("</div>");
         }
-        htmlBuilder.append("<div class=\"oii_desc\">By ").append(WebUtils.escapeMessage(authorName)).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago, last message by ").append(WebUtils.escapeMessage(lastCommentAuthorName)).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago").append("</div>")
+        htmlBuilder.append("<div class=\"oii_desc\">By ").append(WebUtils.escapeMessage(authorName)).append(" ").append(WebUtils.elapsedTime(passedTime)).append(" ago, last message by ").append(WebUtils.escapeMessage(lastCommentAuthorName)).append(" ").append(WebUtils.elapsedTime(lastCommentPassedTime)).append(" ago").append("</div>")
                 .append("</div>")
 
                 .append("<div onclick=\"").append(id).append(".onClick()\" class=\"thread_msgs clickable\">")

@@ -9,13 +9,13 @@ public class HComment implements ContentItem {
 
     private final int commentId;
     private final int indexInThread;
-    private final int userId;
+    private final long userId;
     private final String userName;
     private final String look;
     private final int passedTime;
     private final String message;
     private final HThreadState state;
-    private final int adminId;
+    private final long adminId;
     private final String adminName;
 
     private final int irrelevantId;
@@ -24,14 +24,27 @@ public class HComment implements ContentItem {
     public HComment(HPacket hPacket) {
         commentId = hPacket.readInteger();
         indexInThread = hPacket.readInteger();
-        userId = hPacket.readInteger();
+        userId = hPacket.readLong();
         userName = hPacket.readString(StandardCharsets.UTF_8);
         look = hPacket.readString();
         passedTime = hPacket.readInteger();
         message = hPacket.readString(StandardCharsets.UTF_8);
         state = HThreadState.fromValue(hPacket.readByte());
-        adminId = hPacket.readInteger();
-        adminName = hPacket.readString(StandardCharsets.UTF_8);
+
+        // sulake did an oopsie here
+        if (hPacket.readInteger(hPacket.getReadIndex()) == 0
+                && hPacket.readUshort(hPacket.getReadIndex() + 4) == 7
+                && hPacket.getReadIndex() + 4 + 2 + 7 <= hPacket.getBytesLength()
+                && hPacket.readString(hPacket.getReadIndex() + 4).equals("unknown")) {
+            adminId = 0;
+            adminName = "unknown";
+            hPacket.setReadIndex(hPacket.getReadIndex() + 4 + 2 + 7);
+        }
+        else {
+            adminId = hPacket.readLong();
+            adminName = hPacket.readString(StandardCharsets.UTF_8);
+        }
+
         irrelevantId = hPacket.readInteger();
         authorPostCount = hPacket.readInteger();
     }
@@ -44,7 +57,7 @@ public class HComment implements ContentItem {
         return indexInThread;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -68,7 +81,7 @@ public class HComment implements ContentItem {
         return state;
     }
 
-    public int getAdminId() {
+    public long getAdminId() {
         return adminId;
     }
 

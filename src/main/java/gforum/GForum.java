@@ -29,6 +29,7 @@ public class GForum extends ExtensionForm {
     public Button button;
     private GForumController gForumController;
     private HashSupport hashSupport = null;
+    private Stage primaryStage = null;
 
     public static void main(String[] args) {
         runExtensionForm(args, GForum.class);
@@ -43,6 +44,7 @@ public class GForum extends ExtensionForm {
     public ExtensionForm launchForm(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(GForum.class.getResource("gforum.fxml"));
         Parent root = loader.load();
+        this.primaryStage = primaryStage;
 
 //        System.out.println(new File(GForum.class.getResource("gforum.fxml").toURI()).getPath());
 
@@ -65,10 +67,6 @@ public class GForum extends ExtensionForm {
     @Override
     protected void initExtension() {
         hashSupport = new HashSupport(this);
-//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumList", this::onForumOverview);
-//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumThreads", this::onThreadOverview);
-//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumComments", this::onCommentOverview);
-//        hashSupport.intercept(HMessage.Direction.TOCLIENT, "GuildForumData", this::onForumStats);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumsList", this::onForumOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
@@ -145,5 +143,9 @@ public class GForum extends ExtensionForm {
 
     public GForumController getController() {
         return gForumController;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
     }
 }
