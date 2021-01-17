@@ -96,11 +96,8 @@ public class HForum implements ContentItem {
 
     private GForum gForum = null;
     public void onClick() {
-        gForum.getController().requestOverview(1);
         gForum.getHashSupport().sendToServer("GetForumStats", guildId);
-//        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_FORUMSTATS, guildId));
-        gForum.getHashSupport().sendToServer("GetForumThreads", guildId, 0, GForum.PAGESIZE);
-//        gForum.sendToServer(new HPacket(Constants.OUT_REQUEST_THREADOVERVIEW, guildId, 0, GForum.PAGESIZE));
+        gForum.getThreadOverviewBuffer().request(true, 0, guildId);
     }
 
     @Override

@@ -24,6 +24,13 @@ public class HThreadOverview implements HOverview {
         }
     }
 
+    public HThreadOverview(long guildId, int startIndex, List<HThread> threads, HForumStats forumStats) {
+        this.guildId = guildId;
+        this.startIndex = startIndex;
+        this.threads = threads;
+        this.forumStats = forumStats;
+    }
+
     public void setForumStats(HForumStats forumStats) {
         this.forumStats = forumStats;
     }
@@ -60,8 +67,8 @@ public class HThreadOverview implements HOverview {
     }
 
     @Override
-    public ContentItem getContentItem(int i) {
-        return getThreads().get(i);
+    public List<HThread> getContentItems() {
+        return getThreads();
     }
 
     @Override
@@ -70,9 +77,8 @@ public class HThreadOverview implements HOverview {
     }
 
     @Override
-    public void request(GForum gForum, int start, int amount) {
-        gForum.getHashSupport().sendToServer("GetForumThreads",
-                forumStats.gethForum().getGuildId(), start, amount);
+    public void request(GForum gForum, int start) {
+        gForum.getThreadOverviewBuffer().request(false, start, forumStats.gethForum().getGuildId());
     }
 
     @Override
@@ -82,11 +88,10 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public void returnClick(GForum gForum) {
-
         gForum.getHashSupport().sendToServer("UpdateForumReadMarkers",(short)1,  guildId,  forumStats.gethForum().getLastCommentIndexInForum(), false);
-        gForum.getController().requestOverview(0);
+
         HForumOverview overview = gForum.getController().getCurrentForumOverview();
-        overview.request(gForum, overview.getStartIndex(), overview.getAmount());
+        gForum.getForumOverviewBuffer().request(true, overview.getStartIndex(), overview.getViewMode().getVal());
     }
 
     @Override
@@ -96,5 +101,9 @@ public class HThreadOverview implements HOverview {
 
     public List<HThread> getThreads() {
         return threads;
+    }
+
+    public HForumStats getForumStats() {
+        return forumStats;
     }
 }

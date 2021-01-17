@@ -50,18 +50,15 @@ public class GForumController implements Initializable {
                 Element most_viewed_click = webView.getEngine().getDocument().getElementById("overview_most_viewed");
 
                 ((EventTarget) my_forums_click).addEventListener("click", event -> {
-                    requestOverview(0);
-                    HForumOverview.requestFirst(gForum, HForumOverviewType.MY_FORUMS, GForum.PAGESIZE);
+                    gForum.getForumOverviewBuffer().request(true, 0, HForumOverviewType.MY_FORUMS.getVal());
                 }, true);
 
                 ((EventTarget) most_active_click).addEventListener("click", event -> {
-                    requestOverview(0);
-                    HForumOverview.requestFirst(gForum, HForumOverviewType.MOST_ACTIVE, GForum.PAGESIZE);
+                    gForum.getForumOverviewBuffer().request(true, 0, HForumOverviewType.MOST_ACTIVE.getVal());
                 }, true);
 
                 ((EventTarget) most_viewed_click).addEventListener("click", event -> {
-                    requestOverview(0);
-                    HForumOverview.requestFirst(gForum, HForumOverviewType.MOST_VIEWED, GForum.PAGESIZE);
+                    gForum.getForumOverviewBuffer().request(true, 0, HForumOverviewType.MOST_VIEWED.getVal());
                 }, true);
 
                 Element first_btn = webView.getEngine().getDocument().getElementById("first_btn");
@@ -72,24 +69,24 @@ public class GForumController implements Initializable {
                 ((EventTarget) first_btn).addEventListener("click", event -> {
                     if (first_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
-                    currentOverview.request(gForum, 0, GForum.PAGESIZE);
+                    currentOverview.request(gForum, 0);
                 }, true);
                 ((EventTarget) prev_btn).addEventListener("click", event -> {
                     if (prev_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
-                    currentOverview.request(gForum, currentOverview.getStartIndex() - GForum.PAGESIZE, GForum.PAGESIZE);
+                    currentOverview.request(gForum, currentOverview.getStartIndex() - GForum.PAGESIZE);
                 }, true);
                 ((EventTarget) next_btn).addEventListener("click", event -> {
                     if (next_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
-                    currentOverview.request(gForum, currentOverview.getStartIndex() + GForum.PAGESIZE, GForum.PAGESIZE);
+                    currentOverview.request(gForum, currentOverview.getStartIndex() + GForum.PAGESIZE);
                 }, true);
                 ((EventTarget) last_btn).addEventListener("click", event -> {
                     if (last_btn.getAttribute("class").contains("gdisabled")) return;
                     requestOverview(currentOverview.internalRank());
                     int lastPageSize = currentOverview.getMaxAmount() % GForum.PAGESIZE;
                     if (lastPageSize == 0) lastPageSize = GForum.PAGESIZE;
-                    currentOverview.request(gForum, currentOverview.getMaxAmount() - lastPageSize, GForum.PAGESIZE);
+                    currentOverview.request(gForum, currentOverview.getMaxAmount() - lastPageSize);
                 }, true);
 
                 Element return_or_mark_read_btn = webView.getEngine().getDocument().getElementById("return_or_mark_read_btn");
@@ -131,7 +128,7 @@ public class GForumController implements Initializable {
             Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
             WebUtils.clearElement(content_items_container);
             for (int i = 0; i < overview.getAmount(); i++) {
-                ContentItem contentItem = overview.getContentItem(i);
+                ContentItem contentItem = overview.getContentItems().get(i);
                 contentItem.addHtml(i, gForum);
             }
             if (scrollTop) {
@@ -205,7 +202,6 @@ public class GForumController implements Initializable {
         if (requestingOverview != 1 || currentForumStats == null) {
             return;
         }
-        threadOverview.setForumStats(currentForumStats);
         clearRequest();
         currentCommentOverview = null;
         currentThreadOverview = threadOverview;
@@ -219,6 +215,20 @@ public class GForumController implements Initializable {
                         WebUtils.escapeMessage(currentForumStats.gethForum().getGuildDescription())
                 ));
                 setOverview(threadOverview, true);
+            });
+        }
+    }
+
+    public void setCommentOverview(HCommentOverview commentOverview) {
+        if (requestingOverview != 2 || currentForumStats == null || currentThreadOverview == null) {
+            return;
+        }
+
+        currentCommentOverview = commentOverview;
+        currentOverview = commentOverview;
+        if (initialized) {
+            Platform.runLater(() -> {
+                setOverview(commentOverview, true);
             });
         }
     }

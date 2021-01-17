@@ -7,6 +7,9 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
 import gforum.entities.*;
+import gforum.entities.overviewbuffer.CommentOverviewBuffer;
+import gforum.entities.overviewbuffer.ForumOverviewBuffer;
+import gforum.entities.overviewbuffer.ThreadOverviewBuffer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -64,6 +67,11 @@ public class GForum extends ExtensionForm {
         return this;
     }
 
+
+    private CommentOverviewBuffer commentOverviewBuffer = new CommentOverviewBuffer(this);
+    private ThreadOverviewBuffer threadOverviewBuffer = new ThreadOverviewBuffer(this);
+    private ForumOverviewBuffer forumOverviewBuffer = new ForumOverviewBuffer(this);
+
     @Override
     protected void initExtension() {
         hashSupport = new HashSupport(this);
@@ -112,8 +120,7 @@ public class GForum extends ExtensionForm {
     protected void onStartConnection() {
         if (doOnce) {
             doOnce = false;
-            gForumController.requestOverview(0);
-            HForumOverview.requestFirst(this, HForumOverviewType.MY_FORUMS, GForum.PAGESIZE);
+            forumOverviewBuffer.request(true, 0, HForumOverviewType.MY_FORUMS.getVal());
         }
     }
 
@@ -125,16 +132,19 @@ public class GForum extends ExtensionForm {
     private void onCommentOverview(HMessage hMessage) {
         HCommentOverview commentOverview = new HCommentOverview(hMessage.getPacket());
         commentOverview.setgForum(this);
+        commentOverviewBuffer.refill(commentOverview);
     }
 
     private void onThreadOverview(HMessage hMessage) {
+        if (gForumController.getCurrentForumStats() == null) return;
         HThreadOverview threadOverview = new HThreadOverview(hMessage.getPacket());
-        gForumController.setThreadOverview(threadOverview);
+        threadOverview.setForumStats(gForumController.getCurrentForumStats());
+        threadOverviewBuffer.refill(threadOverview);
     }
 
     private void onForumOverview(HMessage hMessage) {
         HForumOverview forumOverview = new HForumOverview(hMessage.getPacket());
-        gForumController.setForumOverview(forumOverview);
+        forumOverviewBuffer.refill(forumOverview);
     }
 
     public HashSupport getHashSupport() {
@@ -147,5 +157,17 @@ public class GForum extends ExtensionForm {
 
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    public CommentOverviewBuffer getCommentOverviewBuffer() {
+        return commentOverviewBuffer;
+    }
+
+    public ThreadOverviewBuffer getThreadOverviewBuffer() {
+        return threadOverviewBuffer;
+    }
+
+    public ForumOverviewBuffer getForumOverviewBuffer() {
+        return forumOverviewBuffer;
     }
 }

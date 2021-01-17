@@ -11,13 +11,13 @@ public interface HOverview {
 
     int getStartIndex();
     int getAmount();
-    ContentItem getContentItem(int i);
+    List<? extends ContentItem> getContentItems();
 
     int getMaxAmount();
 
     void returnClick(GForum gForum);
     void addClick(GForum gForum);
-    void request(GForum gForum, int start, int amount);
+    void request(GForum gForum, int start);
 
     int internalRank();
 }

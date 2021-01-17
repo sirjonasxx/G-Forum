@@ -2,10 +2,15 @@ package gforum.entities;
 
 import gearth.protocol.HPacket;
 import gforum.GForum;
+import gforum.webview.WebUtils;
+import netscape.javascript.JSObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.Predicate;
 
 public class HComment implements ContentItem {
+
+    public static final String OUTFIT_URL = "https://www.habbo.com/habbo-imaging/avatarimage?&figure=%s&direction=2&head_direction=2";
 
     private final int commentId;
     private final int indexInThread;
@@ -97,9 +102,63 @@ public class HComment implements ContentItem {
         return authorPostCount;
     }
 
+    private GForum gForum = null;
+
     @Override
     public void addHtml(int i, GForum gForum) {
+        this.gForum = gForum;
 
+        HCommentOverview currentCommentOverview = gForum.getController().getCurrentCommentOverview();
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HForumStats hForumStats = gForum.getController().getCurrentForumStats();
+        int threadId = currentCommentOverview.getThreadId();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+
+        boolean staffLocked = state == HThreadState.HIDDEN_BY_STAFF;
+        boolean hidden = state == HThreadState.HIDDEN_BY_ADMIN;
+        boolean open = state == HThreadState.OPEN;
+
+        boolean isUnread = indexInThread >= hThread.getAmountComments() - hThread.getUnreadComments();
+
+        boolean canComment = !staffLocked && (hForumStats.getErrorModerate().equals("") || (open && !hThread.isLocked() && hForumStats.getErrorPost().equals("")));
+        boolean canModerate = !staffLocked && (hForumStats.getErrorModerate().equals(""));
+
+
+        String id = "comment" + i + "_" + System.currentTimeMillis();
+
+        StringBuilder htmlBuilder = new StringBuilder()
+                .append("<div class=\"comment_item content_item\">")
+
+                .append("<div class=\"comment_header\">")
+                .append("<div class=\"ch_timeago\">").append(WebUtils.elapsedTime(passedTime)).append(" ago</div>")
+                .append("<div class=\"ch_index\">#").append(indexInThread + 1).append("</div>")
+                .append("<div class=\"ch_buttons\">")
+                .append("<img ").append(canModerate ? "class=\"clickable\" " : "").append("src=\"images/topics/").append(!canModerate ? "placeholder" : (open ? "delete" : "undelete")).append(".png\" alt=\"\">")
+                .append("<img class=\"clickable\" src=\"images/topics/report.png\" alt=\"\">")
+                .append("<img ").append(canComment ? "class=\"clickable\" " : "").append("src=\"images/topics/").append(canComment ? "quote" : "placeholder").append(".png\" alt=\"\">")
+                .append("</div>")
+                .append("</div>")
+
+                .append("<div class=\"comment_body ").append(staffLocked ? "comment_staffhidden" : (hidden ? "comment_hidden" : (isUnread ? "comment_unread" : "comment_open"))).append("\">")
+                .append("<div class=\"cb_author\">")
+                .append("<div class=\"cba_name\">").append(WebUtils.escapeMessage(userName)).append("</div>")
+                .append("<div class=\"cba_messages\">").append(authorPostCount).append(" messages</div>")
+                .append("<div class=\"cba_look\"><img src=\"").append(String.format(OUTFIT_URL, look)).append("\" alt=\"\"></div>")
+                .append("</div>")
+                .append("<div class=\"cb_content\">")
+                .append((staffLocked || (hidden && !canModerate)) ? "Thread hidden by " + WebUtils.escapeMessage(adminName) : WebUtils.escapeMessage(message))
+                .append("</div>")
+                .append("</div>")
+
+                .append("</div>")
+                .append("<div class=\"comment_itemcontent_item\"></div>");
+
+        String forum = htmlBuilder.toString();
+        gForum.getController().getWebView().getEngine().executeScript(
+                "document.getElementById('" + gForum.getController().getContentItemsContainer() + "').innerHTML += '" + forum + "';");
+
+        JSObject window = (JSObject) gForum.getController().getWebView().getEngine().executeScript("window");
+        window.setMember(id, this);
     }
 
 }

@@ -194,7 +194,16 @@ public class HThread implements ContentItem {
     }
 
     public void onClick() {
-        System.out.println("click thread");
+        int startComment = amountComments - unreadComments;
+        if (unreadComments == 0) startComment -= 1;
+        int startPage = startComment / GForum.PAGESIZE;
+
+        gForum.getCommentOverviewBuffer().request(
+                true,
+                startPage * GForum.PAGESIZE,
+                gForum.getController().getCurrentForumStats().gethForum().getGuildId(),
+                threadId
+        );
     }
 
     @Override
@@ -221,7 +230,7 @@ public class HThread implements ContentItem {
                 .append("<div class=\"thread_info\">");
 
         if ((adminHidden && !canModerate) || staffHidden) {
-            htmlBuilder.append("<div class=\"oii_name\">").append("Thread hidden by ").append(adminHidden ? WebUtils.escapeMessage(adminName) : "Habbo Staff").append("</div>");
+            htmlBuilder.append("<div class=\"oii_name\">").append("Thread hidden by ").append(/*adminHidden ?*/ WebUtils.escapeMessage(adminName) /*: "Habbo Staff"*/).append("</div>");
         }
         else {
             htmlBuilder.append("<div onclick=\"").append(id).append(".onClick()\" class=\"oii_name clickable\">").append(bold ? "<b>" : "").append(WebUtils.escapeMessage(subject)).append(bold ? "</b>" : "").append("</div>");

@@ -2,6 +2,7 @@ package gforum.entities;
 
 import gearth.protocol.HPacket;
 import gforum.GForum;
+import gforum.webview.WebUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,14 @@ public class HCommentOverview implements HOverview {
         }
     }
 
+    public HCommentOverview(long guildId, int threadId, int startIndex, List<HComment> comments, GForum gForum) {
+        this.guildId = guildId;
+        this.threadId = threadId;
+        this.startIndex = startIndex;
+        this.comments = comments;
+        this.gForum = gForum;
+    }
+
     public long getGuildId() {
         return guildId;
     }
@@ -46,7 +55,11 @@ public class HCommentOverview implements HOverview {
 
     @Override
     public boolean addElementEnabled() {
-        return gForum.getController().getCurrentForumStats().getErrorPost().equals("");
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HForumStats hForumStats = gForum.getController().getCurrentForumStats();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+
+        return hForumStats.getErrorModerate().equals("") || (!hThread.isLocked() && hForumStats.getErrorPost().equals(""));
     }
 
     @Override
@@ -64,19 +77,26 @@ public class HCommentOverview implements HOverview {
     }
 
     @Override
-    public ContentItem getContentItem(int i) {
-        return getComments().get(i);
+    public List<HComment> getContentItems() {
+        return getComments();
     }
 
     @Override
     public int getMaxAmount() {
-        // TODO
-        return 0;
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+
+        return hThread.getAmountComments();
     }
 
     @Override
     public void returnClick(GForum gForum) {
-        // TODO
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        gForum.getThreadOverviewBuffer().request(
+                false,
+                hThreadOverview.getStartIndex(),
+                hThreadOverview.getForumStats().gethForum().getGuildId()
+        );
     }
 
     @Override
@@ -85,8 +105,8 @@ public class HCommentOverview implements HOverview {
     }
 
     @Override
-    public void request(GForum gForum, int start, int amount) {
-        // TODO
+    public void request(GForum gForum, int start) {
+        gForum.getCommentOverviewBuffer().request(false, start, guildId, threadId);
     }
 
     @Override
