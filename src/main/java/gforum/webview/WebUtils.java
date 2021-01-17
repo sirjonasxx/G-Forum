@@ -18,7 +18,7 @@ public class WebUtils {
         entityMap.put("&", "&amp;");
         entityMap.put("<", "&lt;");
         entityMap.put(">", "&gt;");
-        entityMap.put("\"", "&quot;");
+//        entityMap.put("\"", "&quot;");
         entityMap.put("'", "&#39;");
         entityMap.put("/", "&#x2F;");
         entityMap.put("`", "&#x60;");
@@ -51,9 +51,9 @@ public class WebUtils {
     public static String escapeMessage(String text) {
         text = escapeHtml(text);
         return text
-                .replace("\n\r", "<br />")
-                .replace("\n", "<br />")
-                .replace("\r", "<br />");
+                .replace("\n\r", "<br>")
+                .replace("\n", "<br>")
+                .replace("\r", "<br>");
     }
 
     public static void clearElement(Element node) {

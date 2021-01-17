@@ -6,6 +6,9 @@ import gforum.webview.WebUtils;
 import netscape.javascript.JSObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class HComment implements ContentItem {
@@ -104,6 +107,39 @@ public class HComment implements ContentItem {
 
     private GForum gForum = null;
 
+    private String commentInHtml() {
+        String comment = WebUtils.escapeMessage(message);
+        List<String> lines = new ArrayList<>(Arrays.asList(comment.split("<br>")));
+
+        boolean isquoting = false;
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+
+            if (!isquoting && line.startsWith("&gt; ")) {
+                isquoting = true;
+                line = "<div class=\"cbc_quote\">" + line.substring(5);
+            }
+            else if (isquoting && line.startsWith("&gt; ")) {
+                line = line.substring(5);
+            }
+            else if (isquoting && !line.startsWith("&gt; ")) {
+                isquoting = false;
+                String prev = lines.get(i - 1);
+                lines.set(i-1, prev.substring(0, prev.length() - 4) + "</div>");
+            }
+
+
+            line = line.replaceAll("\\*([^*]*)\\*", "<b>$1</b>")
+                    .replaceAll("_([^_<>]*)_", "<i>$1</i>")
+                    .replaceAll("(^| |>)@([^ <>]*)($| |<)", "$1<u>$2</u>$3");
+
+            lines.set(i, line + (i == lines.size() - 1 ? "" : "<br>"));
+        }
+
+        return String.join("", lines);
+    }
+
     @Override
     public void addHtml(int i, GForum gForum) {
         this.gForum = gForum;
@@ -146,7 +182,7 @@ public class HComment implements ContentItem {
                 .append("<div class=\"cba_look\"><img src=\"").append(String.format(OUTFIT_URL, look)).append("\" alt=\"\"></div>")
                 .append("</div>")
                 .append("<div class=\"cb_content\">")
-                .append((staffLocked || (hidden && !canModerate)) ? "Thread hidden by " + WebUtils.escapeMessage(adminName) : WebUtils.escapeMessage(message))
+                .append((staffLocked || (hidden && !canModerate)) ? "Thread hidden by " + WebUtils.escapeMessage(adminName) : commentInHtml())
                 .append("</div>")
                 .append("</div>")
 
@@ -159,6 +195,15 @@ public class HComment implements ContentItem {
 
         JSObject window = (JSObject) gForum.getController().getWebView().getEngine().executeScript("window");
         window.setMember(id, this);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(
+                "@test hallo @jonas *jij _bent_ @tof* xd bye @bye"
+                        .replaceAll("\\*([^*]*)\\*", "<b>$1</b>")
+                        .replaceAll("_([^_<>]*)_", "<i>$1</i>")
+                        .replaceAll("(^| |>)@([^ <>]*)($| |<)", "$1<u>$2</u>$3")
+        );
     }
 
 }
