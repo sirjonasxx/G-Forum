@@ -116,9 +116,21 @@ public class GForum extends ExtensionForm {
 
 
     private volatile boolean doOnce = true;
+
+    private boolean isConnectedToGame = false;
     @Override
     protected void onStartConnection() {
-        if (doOnce) {
+        isConnectedToGame = true;
+    }
+
+    @Override
+    protected void onEndConnection() {
+        isConnectedToGame = false;
+    }
+
+    @Override
+    protected void onShow() {
+        if (doOnce && isConnectedToGame) {
             doOnce = false;
             forumOverviewBuffer.request(true, 0, HForumOverviewType.MY_FORUMS.getVal());
         }

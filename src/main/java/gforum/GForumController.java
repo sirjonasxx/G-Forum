@@ -228,6 +228,12 @@ public class GForumController implements Initializable {
         currentOverview = commentOverview;
         if (initialized) {
             Platform.runLater(() -> {
+                int threadId = commentOverview.getThreadId();
+                HThread hThread = currentThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+                webView.getEngine().executeScript(String.format("setThread(\"%s\")",
+                        WebUtils.escapeMessage(hThread.getSubject()))
+                );
+
                 setOverview(commentOverview, true);
             });
         }

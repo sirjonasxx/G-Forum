@@ -45,6 +45,10 @@ function setForum(badge, title, desc) {
     $("#content_title").html("All Threads");
 }
 
+function setThread(name) {
+    $("#content_title").html(name);
+}
+
 // $(window).on('load', function () {
 //     for (let overviewName in overviewPagesInfo) {
 //         $(`#overview_${overviewName}`).click( function(e) {e.preventDefault(); setOverview(overviewName)});
