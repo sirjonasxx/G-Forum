@@ -116,14 +116,14 @@ public class HComment implements ContentItem {
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
 
-            if (!isquoting && line.startsWith("&gt; ")) {
+            if (!isquoting && line.startsWith("&gt;")) {
                 isquoting = true;
-                line = "<div class=\"cbc_quote\">" + line.substring(5);
+                line = "<div class=\"cbc_quote\">" + line.substring(line.startsWith("&gt; ") ? 5 : 4);
             }
-            else if (isquoting && line.startsWith("&gt; ")) {
-                line = line.substring(5);
+            else if (isquoting && line.startsWith("&gt;")) {
+                line = line.substring(line.startsWith("&gt; ") ? 5 : 4);
             }
-            else if (isquoting && !line.startsWith("&gt; ")) {
+            else if (isquoting && !line.startsWith("&gt;")) {
                 isquoting = false;
                 String prev = lines.get(i - 1);
                 lines.set(i-1, prev.substring(0, prev.length() - 4) + "</div>");
@@ -217,6 +217,8 @@ public class HComment implements ContentItem {
                         .replaceAll("_([^_<>]*)_", "<i>$1</i>")
                         .replaceAll("(^| |>)@([^ <>]*)($| |<)", "$1<u>$2</u>$3")
         );
+
+        System.out.println("hi".startsWith("hi"));
     }
 
 }
