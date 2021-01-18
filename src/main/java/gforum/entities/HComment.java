@@ -209,16 +209,4 @@ public class HComment implements ContentItem {
 
         return indexInThread >= hThread.getAmountComments() - hThread.getUnreadComments();
     }
-
-    public static void main(String[] args) {
-        System.out.println(
-                "@test hallo @jonas *jij _bent_ @tof* xd bye @bye"
-                        .replaceAll("\\*([^*]*)\\*", "<b>$1</b>")
-                        .replaceAll("_([^_<>]*)_", "<i>$1</i>")
-                        .replaceAll("(^| |>)@([^ <>]*)($| |<)", "$1<u>$2</u>$3")
-        );
-
-        System.out.println("hi".startsWith("hi"));
-    }
-
 }
