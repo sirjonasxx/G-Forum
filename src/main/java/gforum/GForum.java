@@ -137,6 +137,11 @@ public class GForum extends ExtensionForm {
         }
     }
 
+    @Override
+    protected void onHide() {
+        getController().maybeUpdateRemoteCommentReadMarker();
+    }
+
     private void onForumStats(HMessage hMessage) {
         HForumStats forumStats = new HForumStats(hMessage.getPacket());
         gForumController.setForumStats(forumStats);

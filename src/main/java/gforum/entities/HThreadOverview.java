@@ -88,6 +88,7 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public void returnClick(GForum gForum) {
+        forumStats.setUpdateReadMarker(-1);
         gForum.getHashSupport().sendToServer("UpdateForumReadMarkers",(short)1,  guildId,  forumStats.gethForum().getLastCommentIndexInForum(), false);
 
         HForumOverview overview = gForum.getController().getCurrentForumOverview();

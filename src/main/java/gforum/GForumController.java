@@ -52,14 +52,17 @@ public class GForumController implements Initializable {
                 Element most_viewed_click = webView.getEngine().getDocument().getElementById("overview_most_viewed");
 
                 ((EventTarget) my_forums_click).addEventListener("click", event -> {
+                    maybeUpdateRemoteCommentReadMarker();
                     gForum.getForumOverviewBuffer().request(true, 0, HForumOverviewType.MY_FORUMS.getVal());
                 }, true);
 
                 ((EventTarget) most_active_click).addEventListener("click", event -> {
+                    maybeUpdateRemoteCommentReadMarker();
                     gForum.getForumOverviewBuffer().request(true, 0, HForumOverviewType.MOST_ACTIVE.getVal());
                 }, true);
 
                 ((EventTarget) most_viewed_click).addEventListener("click", event -> {
+                    maybeUpdateRemoteCommentReadMarker();
                     gForum.getForumOverviewBuffer().request(true, 0, HForumOverviewType.MOST_VIEWED.getVal());
                 }, true);
 
@@ -180,6 +183,7 @@ public class GForumController implements Initializable {
             return;
         }
         clearRequest();
+        currentForumStats = null;
         currentThreadOverview = null;
         currentCommentOverview = null;
         currentForumOverview = forumOverview;
@@ -234,6 +238,21 @@ public class GForumController implements Initializable {
                 );
 
                 setOverview(commentOverview, true);
+                Optional<HComment> maybe = commentOverview.getComments().stream().filter(HComment::isUnread).findFirst();
+                if (maybe.isPresent()) {
+                    HComment firstUnread = maybe.get();
+                    webView.getEngine().executeScript("document.getElementById('" + firstUnread.getId() + "').scrollIntoView();");
+                }
+
+                int readAmount = currentCommentOverview.getComments().get(0).getIndexInThread() + currentCommentOverview.getComments().size();
+                int unreadAmount = hThread.getAmountComments() - readAmount;
+                if (unreadAmount < hThread.getUnreadComments()) {
+                    hThread.setUnreadComments(unreadAmount);
+                    int newLatestReadId = currentCommentOverview.getComments().get(currentCommentOverview.getComments().size() - 1).getCommentId();
+                    if (newLatestReadId > currentForumStats.getUpdateReadMarker()) {
+                        currentForumStats.setUpdateReadMarker(newLatestReadId);
+                    }
+                }
             });
         }
     }
@@ -247,8 +266,18 @@ public class GForumController implements Initializable {
         requestingOverview = rank;
     }
 
-
-
+    public void maybeUpdateRemoteCommentReadMarker() { //sry
+        if (currentForumStats != null && currentForumStats.getUpdateReadMarker() != -1) {
+            gForum.getHashSupport().sendToServer(
+                    "UpdateForumReadMarkers",
+                    (short)1,
+                    currentForumStats.gethForum().getGuildId(),
+                    currentForumStats.getUpdateReadMarker(),
+                    false
+            );
+            currentForumStats.setUpdateReadMarker(-1);
+        }
+    }
 
 
     public WebView getWebView() {

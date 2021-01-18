@@ -20,7 +20,7 @@ public class HThread implements ContentItem {
 
     private final int passedTime;
     private final int amountComments;
-    private final int unreadComments;
+    private volatile int unreadComments;
 
     private final int lastCommentIndexInForum;
     private final long lastCommentAuthorId;
@@ -32,6 +32,7 @@ public class HThread implements ContentItem {
     private final String adminName;
 
     private final int unknownThreadId;
+
 
     public HThread(HPacket hPacket) {
         threadId = hPacket.readInteger();
@@ -140,9 +141,9 @@ public class HThread implements ContentItem {
         return unknownThreadId;
     }
 
-
-
-
+    public void setUnreadComments(int unreadComments) {
+        this.unreadComments = unreadComments;
+    }
 
     private GForum gForum = null;
     private boolean hasPermissions() {

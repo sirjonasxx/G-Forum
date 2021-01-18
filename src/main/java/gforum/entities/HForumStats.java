@@ -21,6 +21,8 @@ public class HForumStats {
     private final boolean isOwner;
     private final boolean isOwnerOrStaff;
 
+    private volatile int updateReadMarker = -1;
+
     public HForumStats(HPacket hPacket) {
         hForum = new HForum(hPacket);
 
@@ -85,5 +87,14 @@ public class HForumStats {
 
     public boolean isOwnerOrStaff() {
         return isOwnerOrStaff;
+    }
+
+
+    public int getUpdateReadMarker() {
+        return updateReadMarker;
+    }
+
+    public void setUpdateReadMarker(int updateReadMarker) {
+        this.updateReadMarker = updateReadMarker;
     }
 }
