@@ -140,6 +140,31 @@ public class HComment implements ContentItem {
         return String.join("", lines);
     }
 
+    public void hideClick() {
+        HForum forum = gForum.getController().getCurrentForumStats().gethForum();
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HCommentOverview currentCommentOverview = gForum.getController().getCurrentCommentOverview();
+        int threadId = currentCommentOverview.getThreadId();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+
+        gForum.getHashSupport().sendToServer("ModerateForumMessage",
+                forum.getGuildId(),
+                hThread.getThreadId(),
+                commentId,
+                state == HThreadState.HIDDEN_BY_ADMIN ? 1 : 10
+        );
+    }
+
+    public void report() {
+        System.out.println("report");
+        // TODO
+    }
+
+    public void quote() {
+        System.out.println("quote");
+        // TODO
+    }
+
     @Override
     public void addHtml(int i, GForum gForum) {
         this.gForum = gForum;
@@ -169,9 +194,9 @@ public class HComment implements ContentItem {
                 .append("<div class=\"ch_timeago\">").append(WebUtils.elapsedTime(passedTime)).append(" ago</div>")
                 .append("<div class=\"ch_index\">#").append(indexInThread + 1).append("</div>")
                 .append("<div class=\"ch_buttons\">")
-                .append("<img ").append(canModerate ? "class=\"clickable\" " : "").append("src=\"images/topics/").append(!canModerate ? "placeholder" : (open ? "delete" : "undelete")).append(".png\" alt=\"\">")
-                .append("<img class=\"clickable\" src=\"images/topics/report.png\" alt=\"\">")
-                .append("<img ").append(canComment ? "class=\"clickable\" " : "").append("src=\"images/topics/").append(canComment ? "quote" : "placeholder").append(".png\" alt=\"\">")
+                .append("<img ").append(canModerate ? "onclick=\"" + id + ".hideClick()\" class=\"clickable\" " : "").append("src=\"images/topics/").append(!canModerate ? "placeholder" : (open ? "delete" : "undelete")).append(".png\" alt=\"\">")
+                .append("<img onclick=\"").append(id).append(".report()\" class=\"clickable\" src=\"images/topics/report.png\" alt=\"\">")
+                .append("<img ").append(canComment ? "onclick=\"" + id +".quote()\" class=\"clickable\" " : "").append("src=\"images/topics/").append(canComment ? "quote" : "placeholder").append(".png\" alt=\"\">")
                 .append("</div>")
                 .append("</div>")
 

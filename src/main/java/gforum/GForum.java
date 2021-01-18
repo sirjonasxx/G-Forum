@@ -81,6 +81,7 @@ public class GForum extends ExtensionForm {
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThread", this::onForumThread);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumMessage", this::onForumMessage);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "Notification", this::onNotification);
     }
 
@@ -91,30 +92,55 @@ public class GForum extends ExtensionForm {
     }
 
 
-    // received after update
+    // received after update(/moderation)
     private void onForumThread(HMessage hMessage) {
         hMessage.setBlocked(true);
 
         HPacket hPacket = hMessage.getPacket();
         long guild = hPacket.readLong();
         HThread hThread = new HThread(hPacket);
-        if (getController().getCurrentForumStats().gethForum().getGuildId() == guild &&
-        getController().getCurrentOverview() instanceof HThreadOverview) {
-            HThreadOverview threadOverview = (HThreadOverview) getController().getCurrentOverview();
+        if (getController().getCurrentForumStats() != null &&
+                getController().getCurrentThreadOverview() != null &&
+                getController().getCurrentForumStats().gethForum().getGuildId() == guild &&
+                getController().getCurrentOverview() instanceof HThreadOverview) {
+            HThreadOverview threadOverview = getController().getCurrentThreadOverview();
             List<HThread> threads = threadOverview.getThreads();
-            boolean succes = false;
             for (int i = 0; i < threads.size(); i++) {
                 HThread maybeThread = threads.get(i);
                 if (maybeThread.getThreadId() == hThread.getThreadId()) {
                     threads.set(i, hThread);
-                    succes = true;
+                    Platform.runLater(() -> gForumController.setOverview(threadOverview, false));
                     break;
                 }
             }
-            if (succes) {
-                Platform.runLater(() -> gForumController.setOverview(threadOverview, false));
+        }
+    }
+
+    // received after update(/moderation)
+    private void onForumMessage(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
+        HPacket hPacket = hMessage.getPacket();
+        long guild = hPacket.readLong();
+        int threadId = hPacket.readInteger();
+        HComment hComment = new HComment(hPacket);
+
+        if (getController().getCurrentCommentOverview() != null &&
+                getController().getCurrentCommentOverview().getGuildId() == guild &&
+                getController().getCurrentCommentOverview().getThreadId() == threadId &&
+                getController().getCurrentOverview() instanceof HCommentOverview) {
+            HCommentOverview commentOverview = getController().getCurrentCommentOverview();
+            List<HComment> comments = commentOverview.getComments();
+            for (int i = 0; i < comments.size(); i++) {
+                HComment maybeComment = comments.get(i);
+                if (maybeComment.getCommentId() == hComment.getCommentId()) {
+                    comments.set(i, hComment);
+                    Platform.runLater(() -> gForumController.setOverview(commentOverview, false));
+                    break;
+                }
             }
         }
+
     }
 
 
