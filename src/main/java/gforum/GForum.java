@@ -10,6 +10,7 @@ import gforum.entities.*;
 import gforum.entities.overviewbuffer.CommentOverviewBuffer;
 import gforum.entities.overviewbuffer.ForumOverviewBuffer;
 import gforum.entities.overviewbuffer.ThreadOverviewBuffer;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -109,7 +110,7 @@ public class GForum extends ExtensionForm {
                 }
             }
             if (succes) {
-                gForumController.setOverview(threadOverview, false);
+                Platform.runLater(() -> gForumController.setOverview(threadOverview, false));
             }
         }
     }

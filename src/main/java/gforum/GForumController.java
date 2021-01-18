@@ -12,7 +12,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.EventTarget;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 
 public class GForumController implements Initializable {
 
@@ -124,56 +126,53 @@ public class GForumController implements Initializable {
 
 
     public void setOverview(HOverview overview, boolean scrollTop) {
-        Platform.runLater(() -> {
-            Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
-            WebUtils.clearElement(content_items_container);
-            for (int i = 0; i < overview.getAmount(); i++) {
-                ContentItem contentItem = overview.getContentItems().get(i);
-                contentItem.addHtml(i, gForum);
-            }
-            if (scrollTop) {
-                webView.getEngine().executeScript("document.getElementById('" + contentItemsContainer + "').scrollTop = 0");
-            }
+        Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
+        WebUtils.clearElement(content_items_container);
+        for (int i = 0; i < overview.getAmount(); i++) {
+            ContentItem contentItem = overview.getContentItems().get(i);
+            contentItem.addHtml(i, gForum);
+        }
+        if (scrollTop) {
+            webView.getEngine().executeScript("document.getElementById('" + contentItemsContainer + "').scrollTop = 0");
+        }
 
-            Element first_btn = webView.getEngine().getDocument().getElementById("first_btn");
-            Element prev_btn = webView.getEngine().getDocument().getElementById("prev_btn");
-            Element next_btn = webView.getEngine().getDocument().getElementById("next_btn");
-            Element last_btn = webView.getEngine().getDocument().getElementById("last_btn");
-            WebUtils.removeClass(first_btn, "gdisabled");
-            WebUtils.removeClass(prev_btn, "gdisabled");
-            WebUtils.removeClass(next_btn, "gdisabled");
-            WebUtils.removeClass(last_btn, "gdisabled");
+        Element first_btn = webView.getEngine().getDocument().getElementById("first_btn");
+        Element prev_btn = webView.getEngine().getDocument().getElementById("prev_btn");
+        Element next_btn = webView.getEngine().getDocument().getElementById("next_btn");
+        Element last_btn = webView.getEngine().getDocument().getElementById("last_btn");
+        WebUtils.removeClass(first_btn, "gdisabled");
+        WebUtils.removeClass(prev_btn, "gdisabled");
+        WebUtils.removeClass(next_btn, "gdisabled");
+        WebUtils.removeClass(last_btn, "gdisabled");
 
-            boolean isLast = overview.getMaxAmount() <= overview.getAmount() + overview.getStartIndex();
-            boolean isFirst = overview.getStartIndex() < GForum.PAGESIZE;
-            if (isLast) {
-                WebUtils.addClass(next_btn, "gdisabled");
-                WebUtils.addClass(last_btn, "gdisabled");
-            }
-            if (isFirst) {
-                WebUtils.addClass(first_btn, "gdisabled");
-                WebUtils.addClass(prev_btn, "gdisabled");
-            }
-            int thispage = Math.max(1, 1 + (overview.getStartIndex() / GForum.PAGESIZE));
-            int lastpage = Math.max(1, 1 + ((overview.getMaxAmount() - 1) / GForum.PAGESIZE));
-            webView.getEngine().executeScript("document.getElementById('paging_lbl').innerHTML = '" + thispage + " / " + lastpage + "';");
-
-
-            Element return_or_mark_read_btn = webView.getEngine().getDocument().getElementById("return_or_mark_read_btn");
-            Element add_btn = webView.getEngine().getDocument().getElementById("add_btn");
-            WebUtils.removeClass((Element) return_or_mark_read_btn.getParentNode(), "invisible");
-            WebUtils.removeClass((Element) add_btn.getParentNode(), "invisible");
-
-            if (overview.returnText() == null) WebUtils.addClass((Element) return_or_mark_read_btn.getParentNode(), "invisible");
-            else webView.getEngine().executeScript("document.getElementById('return_or_mark_read_btn').innerHTML = '" + overview.returnText() + "';");
-            if (overview.addElementText() == null) WebUtils.addClass((Element) add_btn.getParentNode(), "invisible");
-            else webView.getEngine().executeScript("document.getElementById('add_btn').innerHTML = '" + overview.addElementText() + "';");
+        boolean isLast = overview.getMaxAmount() <= overview.getAmount() + overview.getStartIndex();
+        boolean isFirst = overview.getStartIndex() < GForum.PAGESIZE;
+        if (isLast) {
+            WebUtils.addClass(next_btn, "gdisabled");
+            WebUtils.addClass(last_btn, "gdisabled");
+        }
+        if (isFirst) {
+            WebUtils.addClass(first_btn, "gdisabled");
+            WebUtils.addClass(prev_btn, "gdisabled");
+        }
+        int thispage = Math.max(1, 1 + (overview.getStartIndex() / GForum.PAGESIZE));
+        int lastpage = Math.max(1, 1 + ((overview.getMaxAmount() - 1) / GForum.PAGESIZE));
+        webView.getEngine().executeScript("document.getElementById('paging_lbl').innerHTML = '" + thispage + " / " + lastpage + "';");
 
 
-            WebUtils.removeClass((Element) add_btn.getParentNode(), "gdisabled");
-            if (!overview.addElementEnabled()) WebUtils.addClass((Element) add_btn.getParentNode(), "gdisabled");
+        Element return_or_mark_read_btn = webView.getEngine().getDocument().getElementById("return_or_mark_read_btn");
+        Element add_btn = webView.getEngine().getDocument().getElementById("add_btn");
+        WebUtils.removeClass((Element) return_or_mark_read_btn.getParentNode(), "invisible");
+        WebUtils.removeClass((Element) add_btn.getParentNode(), "invisible");
 
-        });
+        if (overview.returnText() == null) WebUtils.addClass((Element) return_or_mark_read_btn.getParentNode(), "invisible");
+        else webView.getEngine().executeScript("document.getElementById('return_or_mark_read_btn').innerHTML = '" + overview.returnText() + "';");
+        if (overview.addElementText() == null) WebUtils.addClass((Element) add_btn.getParentNode(), "invisible");
+        else webView.getEngine().executeScript("document.getElementById('add_btn').innerHTML = '" + overview.addElementText() + "';");
+
+
+        WebUtils.removeClass((Element) add_btn.getParentNode(), "gdisabled");
+        if (!overview.addElementEnabled()) WebUtils.addClass((Element) add_btn.getParentNode(), "gdisabled");
     }
 
     public void setForumOverview(HForumOverview forumOverview) {

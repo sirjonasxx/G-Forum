@@ -106,6 +106,7 @@ public class HComment implements ContentItem {
     }
 
     private GForum gForum = null;
+    private String id = null;
 
     private String commentInHtml() {
         String comment = WebUtils.escapeMessage(message);
@@ -160,10 +161,10 @@ public class HComment implements ContentItem {
         boolean canModerate = !staffLocked && (hForumStats.getErrorModerate().equals(""));
 
 
-        String id = "comment" + i + "_" + System.currentTimeMillis();
+        id = "comment" + i + "_" + System.currentTimeMillis();
 
         StringBuilder htmlBuilder = new StringBuilder()
-                .append("<div class=\"comment_item content_item\">")
+                .append("<div id=\"").append(id).append("\" class=\"comment_item content_item\">")
 
                 .append("<div class=\"comment_header\">")
                 .append("<div class=\"ch_timeago\">").append(WebUtils.elapsedTime(passedTime)).append(" ago</div>")
@@ -182,7 +183,7 @@ public class HComment implements ContentItem {
                 .append("<div class=\"cba_look\"><img src=\"").append(String.format(OUTFIT_URL, look)).append("\" alt=\"\"></div>")
                 .append("</div>")
                 .append("<div class=\"cb_content\">")
-                .append((staffLocked || (hidden && !canModerate)) ? "Thread hidden by " + WebUtils.escapeMessage(adminName) : commentInHtml())
+                .append((staffLocked || (hidden && !canModerate)) ? "Comment hidden by " + WebUtils.escapeMessage(adminName) : commentInHtml())
                 .append("</div>")
                 .append("</div>")
 
@@ -195,6 +196,19 @@ public class HComment implements ContentItem {
 
         JSObject window = (JSObject) gForum.getController().getWebView().getEngine().executeScript("window");
         window.setMember(id, this);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean isUnread() {
+        HCommentOverview currentCommentOverview = gForum.getController().getCurrentCommentOverview();
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        int threadId = currentCommentOverview.getThreadId();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+
+        return indexInThread >= hThread.getAmountComments() - hThread.getUnreadComments();
     }
 
     public static void main(String[] args) {
