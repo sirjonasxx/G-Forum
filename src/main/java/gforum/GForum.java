@@ -93,6 +93,8 @@ public class GForum extends ExtensionForm {
 
     // received after update
     private void onForumThread(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
         HPacket hPacket = hMessage.getPacket();
         long guild = hPacket.readLong();
         HThread hThread = new HThread(hPacket);
@@ -143,17 +145,23 @@ public class GForum extends ExtensionForm {
     }
 
     private void onForumStats(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
         HForumStats forumStats = new HForumStats(hMessage.getPacket());
         gForumController.setForumStats(forumStats);
     }
 
     private void onCommentOverview(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
         HCommentOverview commentOverview = new HCommentOverview(hMessage.getPacket());
         commentOverview.setgForum(this);
         commentOverviewBuffer.refill(commentOverview);
     }
 
     private void onThreadOverview(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
         if (gForumController.getCurrentForumStats() == null) return;
         HThreadOverview threadOverview = new HThreadOverview(hMessage.getPacket());
         threadOverview.setForumStats(gForumController.getCurrentForumStats());
@@ -161,6 +169,8 @@ public class GForum extends ExtensionForm {
     }
 
     private void onForumOverview(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
         HForumOverview forumOverview = new HForumOverview(hMessage.getPacket());
         forumOverviewBuffer.refill(forumOverview);
     }
