@@ -13,6 +13,9 @@
 <!--    <link rel="stylesheet" href="../webview/css/thread_overview.css">-->
 <!--    <link rel="stylesheet" href="../webview/css/comments_overview.css">-->
 
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 </head>
 <body>
 
@@ -33,6 +36,19 @@
 
 
 </div>
+
+<script>
+    // str str str str bool str str
+    function setContents(f_badge, f_title, f_desc, type_subject_lbl, can_edit_subject, subject, message) {
+        $("#logo").empty();
+        $('#logo').prepend(`<img src="${f_badge}" />`);
+
+        $("#info_title_container").html(f_title);
+        $("#info_desc_container").html(f_desc);
+
+    }
+</script>
+
 
 </body>
 </html>

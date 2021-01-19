@@ -2,6 +2,8 @@ package gforum.add_entity;
 
 import gearth.ui.GEarthController;
 import gforum.entities.HForum;
+import gforum.webview.WebUtils;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,7 +22,7 @@ public class AddEntity {
         controller = loader.getController();
         stage.getIcons().add(new Image(getClass().getResourceAsStream("../webview/images/logo.png")));
 
-        stage.setTitle("Add forum message");
+        stage.setTitle("Forum Message");
         stage.setScene(new Scene(root, 455, 415));
         stage.setMinWidth(400);
         stage.setMinHeight(340);
@@ -43,6 +45,8 @@ public class AddEntity {
     }
 
     public void open(boolean isThread, String title, String message, HForum hForum) {
+        controller.setContents(isThread, title, message, hForum);
+
         stage.show();
         stage.requestFocus();
     }
