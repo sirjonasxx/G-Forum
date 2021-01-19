@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../webview/css/general.css">
     <link rel="stylesheet" href="../webview/css/layout.css">
     <link rel="stylesheet" href="../webview/css/buttons.css">
+    <link rel="stylesheet" href="../webview/css/add_item_layout.css">
 <!--    <link rel="stylesheet" href="../webview/css/content.css">-->
 
 <!--    <link rel="stylesheet" href="../webview/css/forum_overview.css">-->
@@ -34,6 +35,24 @@
         </div>
     </div>
 
+    <div id="elements" class="a_container">
+        <div id="subject_lbl" class="a_lbl"></div>
+        <textarea id="subject" class="a_txt a_subject"></textarea>
+        <div class="a_div"></div>
+        <div class="a_lbl">Message</div>
+        <textarea id="message" class="a_txt a_message"></textarea>
+
+        <div id="a_content_buttons">
+            <div class="forumbtn largebtn greybtn">
+                <div id="cancel_btn" class="innerbtn">Cancel</div>
+            </div>
+            <div class="btnspacing"></div>
+            <div class="forumbtn largebtn bluebtn gdisabled">
+                <div id="add_btn" class="innerbtn">Post</div>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 
@@ -45,6 +64,21 @@
 
         $("#info_title_container").html(f_title);
         $("#info_desc_container").html(f_desc);
+
+
+        $("#elements").load(" #elements > *", function() { // fixes a bug
+            $("#subject").keypress(function(event) {
+                if (event.which === 13) {
+                    event.preventDefault();
+                }
+            });
+
+            $("#subject_lbl").html(type_subject_lbl);
+
+            $("#subject").html(subject);
+            $("#subject").attr('readonly', !can_edit_subject);
+            $("#message").html(message);
+        });
 
     }
 </script>

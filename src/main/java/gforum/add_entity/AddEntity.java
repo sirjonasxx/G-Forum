@@ -24,7 +24,7 @@ public class AddEntity {
 
         stage.setTitle("Forum Message");
         stage.setScene(new Scene(root, 455, 415));
-        stage.setMinWidth(400);
+        stage.setMinWidth(410);
         stage.setMinHeight(340);
         stage.getScene().getStylesheets().add(GEarthController.class.getResource("/gearth/ui/bootstrap3.css").toExternalForm());
 

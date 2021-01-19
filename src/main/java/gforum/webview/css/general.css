@@ -27,7 +27,7 @@
 }
 
 
-html, body {
+html, body, textarea {
     height: 100%;
     font-family: "Ubuntu Habbo", Ubuntu, sans-serif;
     /*font-family: "Ubuntu-Habbo", sans-serif;*/

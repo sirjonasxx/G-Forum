@@ -170,12 +170,26 @@ public class HComment implements ContentItem {
         HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == currentCommentOverview.getThreadId()).findFirst().get();
         HForum hForum = gForum.getController().getCurrentForumStats().gethForum();
 
+        String newline = "&#13;&#10;";
+        String preQuote = "&gt; ";
+
         StringBuilder quoteMessage = new StringBuilder();
-        quoteMessage.append(WebUtils.elapsedTime(passedTime)).append(" ").append(userName).append(" wrote:").append("\r");
+        quoteMessage.append(WebUtils.elapsedTime(passedTime)).append(" ").append(userName).append(" wrote:").append(newline);
+
+        boolean wasQuoted = false;
         for (String line : message.split("\r")) {
-            quoteMessage.append("> ").append(line).append("\r");
+            if (line.equals(">") || line.startsWith("> ")) {
+                if (!wasQuoted) {
+                    wasQuoted = true;
+                    quoteMessage.append(preQuote).append("[quote skipped]").append(newline);
+                }
+                continue;
+            }
+            wasQuoted = false;
+
+            quoteMessage.append(preQuote).append(WebUtils.escapeMessage(line)).append(newline);
         }
-        quoteMessage.append("\r");
+        quoteMessage.append(newline);
 
         gForum.getAddEntity().open(false, hThread.getSubject(), quoteMessage.toString(), hForum);
     }
