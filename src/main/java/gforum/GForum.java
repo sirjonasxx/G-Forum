@@ -6,6 +6,7 @@ import gearth.extensions.extra.harble.HashSupport;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
+import gforum.add_entity.AddEntity;
 import gforum.entities.*;
 import gforum.entities.overviewbuffer.CommentOverviewBuffer;
 import gforum.entities.overviewbuffer.ForumOverviewBuffer;
@@ -34,6 +35,7 @@ public class GForum extends ExtensionForm {
     private GForumController gForumController;
     private HashSupport hashSupport = null;
     private Stage primaryStage = null;
+    private AddEntity addEntity = null;
 
     public static void main(String[] args) {
         runExtensionForm(args, GForum.class);
@@ -65,6 +67,9 @@ public class GForum extends ExtensionForm {
 
         gForumController = loader.getController();
         gForumController.setgForum(this);
+
+        addEntity = new AddEntity();
+        addEntity.getController().setgForum(this);
         return this;
     }
 
@@ -223,5 +228,9 @@ public class GForum extends ExtensionForm {
 
     public ForumOverviewBuffer getForumOverviewBuffer() {
         return forumOverviewBuffer;
+    }
+
+    public AddEntity getAddEntity() {
+        return addEntity;
     }
 }

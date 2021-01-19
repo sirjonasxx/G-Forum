@@ -104,7 +104,7 @@ public class GForumController implements Initializable {
                 }, true);
 
                 ((EventTarget) add_btn).addEventListener("click", event -> {
-                    if (currentOverview != null) {
+                    if (currentOverview != null && currentOverview.addElementEnabled()) {
                         currentOverview.addClick(gForum);
                     }
                 }, true);

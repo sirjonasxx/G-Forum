@@ -112,6 +112,7 @@ public class HComment implements ContentItem {
         List<String> lines = new ArrayList<>(Arrays.asList(comment.split("<br>")));
 
         boolean isquoting = false;
+        boolean justEndedQuoting = false;
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
@@ -124,11 +125,14 @@ public class HComment implements ContentItem {
                 line = line.substring(line.startsWith("&gt; ") ? 5 : 4);
             }
             else if (isquoting && !line.startsWith("&gt;")) {
+                justEndedQuoting = true;
                 isquoting = false;
                 String prev = lines.get(i - 1);
                 lines.set(i-1, prev.substring(0, prev.length() - 4) + "</div>");
             }
 
+            if (justEndedQuoting && line.length() == 0) continue;
+            justEndedQuoting = false;
 
             line = line.replaceAll("\\*([^*]*)\\*", "<b>$1</b>")
                     .replaceAll("_([^_<>]*)_", "<i>$1</i>")
@@ -161,8 +165,19 @@ public class HComment implements ContentItem {
     }
 
     public void quote() {
-        System.out.println("quote");
-        // TODO
+        HCommentOverview currentCommentOverview = gForum.getController().getCurrentCommentOverview();
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == currentCommentOverview.getThreadId()).findFirst().get();
+        HForum hForum = gForum.getController().getCurrentForumStats().gethForum();
+
+        StringBuilder quoteMessage = new StringBuilder();
+        quoteMessage.append(WebUtils.elapsedTime(passedTime)).append(" ").append(userName).append(" wrote:").append("\r");
+        for (String line : message.split("\r")) {
+            quoteMessage.append("> ").append(line).append("\r");
+        }
+        quoteMessage.append("\r");
+
+        gForum.getAddEntity().open(false, hThread.getSubject(), quoteMessage.toString(), hForum);
     }
 
     @Override

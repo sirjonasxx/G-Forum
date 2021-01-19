@@ -97,7 +97,7 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public void addClick(GForum gForum) {
-        // TODO
+        gForum.getAddEntity().open(true, "", "", forumStats.gethForum());
     }
 
     public List<HThread> getThreads() {

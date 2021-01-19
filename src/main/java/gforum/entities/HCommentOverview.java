@@ -101,7 +101,11 @@ public class HCommentOverview implements HOverview {
 
     @Override
     public void addClick(GForum gForum) {
-        // TODO
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+        HForum hForum = gForum.getController().getCurrentForumStats().gethForum();
+
+        gForum.getAddEntity().open(false, hThread.getSubject(), "", hForum);
     }
 
     @Override
