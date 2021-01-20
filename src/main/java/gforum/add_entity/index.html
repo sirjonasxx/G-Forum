@@ -35,20 +35,23 @@
         </div>
     </div>
 
-    <div id="elements" class="a_container">
-        <div id="subject_lbl" class="a_lbl"></div>
-        <textarea id="subject" class="a_txt a_subject"></textarea>
-        <div class="a_div"></div>
-        <div class="a_lbl">Message</div>
-        <textarea id="message" class="a_txt a_message"></textarea>
+    <div class="a_container">
+        <div id="elements" class="a_subcontainer">
+            <div id="subject_lbl" class="a_lbl"></div>
+            <textarea id="subject" class="a_txt a_subject"></textarea>
+            <div class="a_div"></div>
+            <div class="a_lbl">Message</div>
+            <textarea id="message" class="a_txt a_message"></textarea>
+        </div>
+
 
         <div id="a_content_buttons">
-            <div class="forumbtn largebtn greybtn">
-                <div id="cancel_btn" class="innerbtn">Cancel</div>
+            <div id="cancel_btn" class="forumbtn largebtn greybtn">
+                <div class="innerbtn">Cancel</div>
             </div>
             <div class="btnspacing"></div>
-            <div class="forumbtn largebtn bluebtn gdisabled">
-                <div id="add_btn" class="innerbtn">Post</div>
+            <div id="add_btn" class="forumbtn largebtn bluebtn">
+                <div class="innerbtn">Post</div>
             </div>
         </div>
     </div>
@@ -67,7 +70,10 @@
 
 
         $("#elements").load(" #elements > *", function() { // fixes a bug
-            $("#subject").keypress(function(event) {
+            let subject_inp = $("#subject");
+            let message_inp =  $("#message");
+
+            subject_inp.keypress(function(event) {
                 if (event.which === 13) {
                     event.preventDefault();
                 }
@@ -75,9 +81,19 @@
 
             $("#subject_lbl").html(type_subject_lbl);
 
-            $("#subject").html(subject);
-            $("#subject").attr('readonly', !can_edit_subject);
-            $("#message").html(message);
+            subject_inp.html(subject);
+            subject_inp.attr('readonly', !can_edit_subject);
+            message_inp.html(message);
+
+            app.subjectValueChange(subject_inp.val());
+            app.messageValueChange(message_inp.val());
+            subject_inp.keyup(function(){
+                app.subjectValueChange(subject_inp.val());
+            });
+            message_inp.keyup(function(){
+                app.messageValueChange(message_inp.val());
+            });
+
         });
 
     }

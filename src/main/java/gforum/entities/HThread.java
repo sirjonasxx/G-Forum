@@ -3,9 +3,12 @@ package gforum.entities;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 import gforum.webview.WebUtils;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import netscape.javascript.JSObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class HThread implements ContentItem {
 
@@ -190,8 +193,23 @@ public class HThread implements ContentItem {
     }
 
     public void report() {
-        System.out.println("report");
-        // TODO
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Report thread");
+        alert.setHeaderText("Are you sure?");
+        alert.setContentText("Are you sure you want to report this thread?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK){
+            gForum.getHashSupport().sendToServer(
+                    "ReportForumThread",
+                    gForum.getController().getCurrentForumStats().gethForum().getGuildId(),
+                    threadId,
+                    22,
+                    "This thread is against the rules" // xd
+            );
+        } else {
+            // do nothing
+        }
     }
 
     public void onClick() {

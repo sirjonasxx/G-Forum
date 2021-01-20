@@ -32,6 +32,7 @@ html, body, textarea {
     font-family: "Ubuntu Habbo", Ubuntu, sans-serif;
     /*font-family: "Ubuntu-Habbo", sans-serif;*/
     margin: 0;
+    overflow-x: hidden;
 }
 
 a, a:visited, a:hover, a:focus, a:hover, a:active { cursor: pointer; color: #3691cf; text-decoration-line: underline; text-decoration-color: #2c78aa; }

@@ -68,8 +68,7 @@ public class GForum extends ExtensionForm {
         gForumController = loader.getController();
         gForumController.setgForum(this);
 
-        addEntity = new AddEntity();
-        addEntity.getController().setgForum(this);
+        addEntity = new AddEntity(this);
         return this;
     }
 
@@ -85,8 +84,13 @@ public class GForum extends ExtensionForm {
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
+
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThread", this::onForumThread);
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumMessage", this::onForumMessage);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "PostForumThreadOk", this::postForumThreadOk);
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "PostForumMessageOk", this::postForumMessageOk);
+
+
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "Notification", this::onNotification);
     }
 
@@ -205,6 +209,58 @@ public class GForum extends ExtensionForm {
         HForumOverview forumOverview = new HForumOverview(hMessage.getPacket());
         forumOverviewBuffer.refill(forumOverview);
     }
+
+    private void postForumMessageOk(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
+        HPacket hPacket = hMessage.getPacket();
+        long guildId = hPacket.readLong();
+        int threadId = hPacket.readInteger();
+        HComment hComment = new HComment(hPacket);
+
+        postOk(guildId, threadId, hComment.getIndexInThread());
+    }
+
+    private void postForumThreadOk(HMessage hMessage) {
+        hMessage.setBlocked(true);
+
+        HPacket hPacket = hMessage.getPacket();
+        long guildId = hPacket.readLong();
+        HThread hThread = new HThread(hPacket);
+
+        HThreadOverview threadOverview = gForumController.getCurrentThreadOverview();
+        if (threadOverview != null && threadOverview.getGuildId() == guildId) { // add to context, but won't be used anymore
+            threadOverview.getThreads().add(hThread);
+        }
+
+        postOk(guildId, hThread.getThreadId(), 0);
+    }
+
+    private void postOk(long guildId, int threadId, int index) {
+        addEntity.onSuccess();
+        HThreadOverview threadOverview = gForumController.getCurrentThreadOverview();
+        HForumOverview forumOverview = gForumController.getCurrentForumOverview();
+        HOverview currentOverview = gForumController.getCurrentOverview();
+
+        if (threadOverview != null && threadOverview.getGuildId() == guildId) {
+            getController().maybeUpdateRemoteCommentReadMarker();
+
+            int startPage = index / GForum.PAGESIZE;
+
+            threadOverview.setInvalidated(true);
+            commentOverviewBuffer.request(
+                    true,
+                    startPage * GForum.PAGESIZE,
+                    guildId,
+                    threadId
+            );
+        }
+        else if(threadOverview == null && forumOverview != null && currentOverview == forumOverview) {
+            forumOverviewBuffer.request(true, forumOverview.getStartIndex(), forumOverview.getViewMode().getVal());
+        }
+
+    }
+
 
     public HashSupport getHashSupport() {
         return hashSupport;

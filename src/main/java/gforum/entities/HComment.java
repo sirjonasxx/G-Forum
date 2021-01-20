@@ -3,12 +3,15 @@ package gforum.entities;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 import gforum.webview.WebUtils;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import netscape.javascript.JSObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class HComment implements ContentItem {
 
@@ -160,8 +163,28 @@ public class HComment implements ContentItem {
     }
 
     public void report() {
-        System.out.println("report");
-        // TODO
+        HCommentOverview currentCommentOverview = gForum.getController().getCurrentCommentOverview();
+        HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == currentCommentOverview.getThreadId()).findFirst().get();
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Report message");
+        alert.setHeaderText("Are you sure?");
+        alert.setContentText("Are you sure you want to report this message?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK){
+            gForum.getHashSupport().sendToServer(
+                    "ReportForumMessage",
+                    gForum.getController().getCurrentForumStats().gethForum().getGuildId(),
+                    hThread.getThreadId(),
+                    commentId,
+                    22,
+                    "This forum message is against the rules" // xd
+            );
+        } else {
+            // do nothing
+        }
     }
 
     public void quote() {
@@ -191,7 +214,7 @@ public class HComment implements ContentItem {
         }
         quoteMessage.append(newline);
 
-        gForum.getAddEntity().open(false, hThread.getSubject(), quoteMessage.toString(), hForum);
+        gForum.getAddEntity().open(hThread.getSubject(), quoteMessage.toString(), hForum, hThread);
     }
 
     @Override

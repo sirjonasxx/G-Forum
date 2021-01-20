@@ -8,6 +8,12 @@
     padding: 8px 3px 0 3px;
 }
 
+.a_subcontainer {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
 .a_lbl {
     flex: 0 0 auto;
     color: white;

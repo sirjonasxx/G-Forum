@@ -92,8 +92,22 @@ public class HCommentOverview implements HOverview {
     @Override
     public void returnClick(GForum gForum) {
         HThreadOverview hThreadOverview = gForum.getController().getCurrentThreadOverview();
+        HForumStats forumStats = gForum.getController().getCurrentForumStats();
+
+        if (hThreadOverview.isInvalidated()) {
+            forumStats.setUpdateReadMarker(-1);
+
+            gForum.getHashSupport().sendToServer(
+                    "UpdateForumReadMarkers",
+                    (short)1,
+                    forumStats.gethForum().getGuildId(),
+                    getComments().get(getComments().size() - 1).getCommentId(),
+                    false
+            );
+        }
+
         gForum.getThreadOverviewBuffer().request(
-                false,
+                hThreadOverview.isInvalidated(),
                 hThreadOverview.getStartIndex(),
                 hThreadOverview.getForumStats().gethForum().getGuildId()
         );
@@ -105,7 +119,7 @@ public class HCommentOverview implements HOverview {
         HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
         HForum hForum = gForum.getController().getCurrentForumStats().gethForum();
 
-        gForum.getAddEntity().open(false, hThread.getSubject(), "", hForum);
+        gForum.getAddEntity().open(hThread.getSubject(), "", hForum, hThread);
     }
 
     @Override

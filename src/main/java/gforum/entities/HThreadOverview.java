@@ -13,6 +13,8 @@ public class HThreadOverview implements HOverview {
     private final List<HThread> threads;
     private HForumStats forumStats = null;
 
+    private volatile boolean invalidated = false;
+
     public HThreadOverview(HPacket hPacket) {
         guildId = hPacket.readLong();
         startIndex = hPacket.readInteger();
@@ -97,7 +99,7 @@ public class HThreadOverview implements HOverview {
 
     @Override
     public void addClick(GForum gForum) {
-        gForum.getAddEntity().open(true, "", "", forumStats.gethForum());
+        gForum.getAddEntity().open("", "", forumStats.gethForum(), null);
     }
 
     public List<HThread> getThreads() {
@@ -106,5 +108,13 @@ public class HThreadOverview implements HOverview {
 
     public HForumStats getForumStats() {
         return forumStats;
+    }
+
+    public boolean isInvalidated() {
+        return invalidated;
+    }
+
+    public void setInvalidated(boolean invalidated) {
+        this.invalidated = invalidated;
     }
 }

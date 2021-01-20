@@ -9,6 +9,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
+import org.w3c.dom.Element;
+import org.w3c.dom.events.EventTarget;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,11 +19,15 @@ public class AddEntityController implements Initializable {
 
 
     private GForum gForum = null;
+    private AddEntity addEntity = null;
 
     private volatile boolean initialized = false;
 
     public BorderPane borderPane;
     private WebView webView;
+
+    private String subject;
+    private String message;
 
 
     @Override
@@ -32,7 +38,23 @@ public class AddEntityController implements Initializable {
         webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 JSObject window = (JSObject) webView.getEngine().executeScript("window");
-                window.setMember("app", gForum);
+                window.setMember("app", this);
+
+
+                Element add_btn = webView.getEngine().getDocument().getElementById("add_btn");
+                ((EventTarget) add_btn).addEventListener("click", event -> {
+                    if (!add_btn.getAttribute("class").contains("gdisabled")) {
+                        addEntity.publish(subject, message);
+
+
+                    }
+                }, true);
+
+
+                Element cancel_btn = webView.getEngine().getDocument().getElementById("cancel_btn");
+                ((EventTarget) cancel_btn).addEventListener("click", event -> {
+                    addEntity.getStage().hide();
+                }, true);
 
                 initialized = true;
             }
@@ -53,8 +75,21 @@ public class AddEntityController implements Initializable {
         )));
     }
 
+    public void subjectValueChange(String value) {
+        subject = value;
+    }
+
+    public void messageValueChange(String value) {
+        message = value;
+    }
+
+
     public void setgForum(GForum gForum) {
         this.gForum = gForum;
+    }
+
+    public void setAddEntity(AddEntity addEntity) {
+        this.addEntity = addEntity;
     }
 
     public WebView getWebView() {
