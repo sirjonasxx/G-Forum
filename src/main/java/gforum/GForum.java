@@ -23,8 +23,8 @@ import java.util.List;
 
 @ExtensionInfo(
         Title =  "G-Forum",
-        Description =  "",
-        Version =  "0.1",
+        Description =  "Legacy forum browser",
+        Version =  "1.0",
         Author =  "sirjonasxx"
 )
 public class GForum extends ExtensionForm {
