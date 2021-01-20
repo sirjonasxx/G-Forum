@@ -32,8 +32,8 @@ public class AddEntity {
     private HForum currentForum = null;
     private HThread currentThread = null;
 
-    private long latestSuccess = -1;
-    private long latestAttempt = -1;
+    private volatile long latestSuccess = -1;
+    private volatile long latestAttempt = -1;
 
     public AddEntity(GForum gForum) throws Exception {
         this.gForum = gForum;

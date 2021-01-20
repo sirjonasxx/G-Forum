@@ -77,6 +77,9 @@ public class GForum extends ExtensionForm {
     private ThreadOverviewBuffer threadOverviewBuffer = new ThreadOverviewBuffer(this);
     private ForumOverviewBuffer forumOverviewBuffer = new ForumOverviewBuffer(this);
 
+    private volatile long latestResponse = -1;
+    private volatile boolean shown = false;
+
     @Override
     protected void initExtension() {
         hashSupport = new HashSupport(this);
@@ -92,6 +95,22 @@ public class GForum extends ExtensionForm {
 
 
         hashSupport.intercept(HMessage.Direction.TOCLIENT, "Notification", this::onNotification);
+
+        new Thread(() -> {
+            while (true) {
+                try { Thread.sleep(50000);
+                } catch (InterruptedException e) { e.printStackTrace(); }
+
+                long passedTime = System.currentTimeMillis() - latestResponse;
+                if(shown && isConnectedToGame && passedTime > 35000 &&
+                        gForumController.getCurrentOverview() != null &&
+                        gForumController.getCurrentOverview() instanceof HForumOverview) {
+
+                    HForumOverview current = gForumController.getCurrentForumOverview();
+                    forumOverviewBuffer.request(true, current.getStartIndex(), current.getViewMode().getVal());
+                }
+            }
+        }).start();
     }
 
     private void onNotification(HMessage hMessage) {
@@ -168,14 +187,26 @@ public class GForum extends ExtensionForm {
 
     @Override
     protected void onShow() {
+        shown = true;
         if (doOnce && isConnectedToGame) {
             doOnce = false;
             forumOverviewBuffer.request(true, 0, HForumOverviewType.MY_FORUMS.getVal());
+        }
+        else if (isConnectedToGame) {
+            long passedTime = System.currentTimeMillis() - latestResponse;
+            if(passedTime > 6000 &&
+                    gForumController.getCurrentOverview() != null &&
+                    gForumController.getCurrentOverview() instanceof HForumOverview) {
+
+                HForumOverview current = gForumController.getCurrentForumOverview();
+                forumOverviewBuffer.request(true, current.getStartIndex(), current.getViewMode().getVal());
+            }
         }
     }
 
     @Override
     protected void onHide() {
+        shown = false;
         getController().maybeUpdateRemoteCommentReadMarker();
     }
 
@@ -187,6 +218,7 @@ public class GForum extends ExtensionForm {
     }
 
     private void onCommentOverview(HMessage hMessage) {
+        latestResponse = System.currentTimeMillis();
         hMessage.setBlocked(true);
 
         HCommentOverview commentOverview = new HCommentOverview(hMessage.getPacket());
@@ -195,6 +227,7 @@ public class GForum extends ExtensionForm {
     }
 
     private void onThreadOverview(HMessage hMessage) {
+        latestResponse = System.currentTimeMillis();
         hMessage.setBlocked(true);
 
         if (gForumController.getCurrentForumStats() == null) return;
@@ -204,6 +237,7 @@ public class GForum extends ExtensionForm {
     }
 
     private void onForumOverview(HMessage hMessage) {
+        latestResponse = System.currentTimeMillis();
         hMessage.setBlocked(true);
 
         HForumOverview forumOverview = new HForumOverview(hMessage.getPacket());
