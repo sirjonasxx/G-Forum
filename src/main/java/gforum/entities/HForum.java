@@ -21,7 +21,7 @@ public class HForum implements ContentItem {
     private final int amountComments;
     private final int unreadComments;
 
-    private final int lastCommentIndexInForum;
+    private volatile int lastCommentIndexInForum;
     private final long lastCommentUserId;
     private final String lastCommentUserName;
     private final int lastCommentPassedTime;
@@ -92,7 +92,9 @@ public class HForum implements ContentItem {
         return lastCommentPassedTime;
     }
 
-
+    public void setLastCommentIndexInForum(int lastCommentIndexInForum) {
+        this.lastCommentIndexInForum = lastCommentIndexInForum;
+    }
 
     private GForum gForum = null;
     public void onClick() {

@@ -105,7 +105,6 @@ public class HCommentOverview implements HOverview {
                     false
             );
         }
-
         gForum.getThreadOverviewBuffer().request(
                 hThreadOverview.isInvalidated(),
                 hThreadOverview.getStartIndex(),

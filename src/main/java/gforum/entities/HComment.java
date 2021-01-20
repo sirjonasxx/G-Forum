@@ -197,7 +197,7 @@ public class HComment implements ContentItem {
         String preQuote = "&gt; ";
 
         StringBuilder quoteMessage = new StringBuilder();
-        quoteMessage.append(WebUtils.elapsedTime(passedTime)).append(" ").append(userName).append(" wrote:").append(newline);
+        quoteMessage.append(WebUtils.elapsedTime(passedTime)).append(" ago ").append(userName).append(" wrote:").append(newline);
 
         boolean wasQuoted = false;
         for (String line : message.split("\r")) {
@@ -226,6 +226,9 @@ public class HComment implements ContentItem {
         HForumStats hForumStats = gForum.getController().getCurrentForumStats();
         int threadId = currentCommentOverview.getThreadId();
         HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
+        if (commentId > hForumStats.gethForum().getLastCommentIndexInForum()) {
+            hForumStats.gethForum().setLastCommentIndexInForum(commentId);
+        }
 
         boolean staffLocked = state == HThreadState.HIDDEN_BY_STAFF;
         boolean hidden = state == HThreadState.HIDDEN_BY_ADMIN;
