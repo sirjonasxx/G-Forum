@@ -44,7 +44,7 @@ public class AddEntity {
         controller.setgForum(gForum);
         controller.setAddEntity(this);
 
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("../webview/images/logo.png")));
+        stage.getIcons().add(new Image(GForum.class.getResourceAsStream("webview/images/logo.png")));
 
         stage.setTitle("Forum Message");
         stage.setScene(new Scene(root, 455, 415));

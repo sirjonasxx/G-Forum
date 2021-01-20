@@ -40,17 +40,19 @@ public abstract class OverviewBuffer<T extends HOverview, V extends ContentItem>
     }
 
     public void request(boolean forceReload, int requestIndex, Object... requestParams) {
-        gForum.getController().requestOverview(rank);
-
         if (!forceReload && objFromRealPacket != null && objMatchesParams(objFromRealPacket, requestParams) &&
                 requestIndex >= objFromRealPacket.getStartIndex() && requestIndex < objFromRealPacket.getStartIndex() + objFromRealPacket.getAmount()) {
+
+            gForum.getController().requestOverview(rank);
 
             int realStartIndex = objFromRealPacket.getStartIndex();
             int listOffset = requestIndex - realStartIndex;
             int listAmount = Math.min(requestIndex - realStartIndex + GForum.PAGESIZE, objFromRealPacket.getContentItems().size());
             setOverview(listOffset, listAmount);
         }
-        else {
+        else if (gForum.isConnectedToGame()) {
+            gForum.getController().requestOverview(rank);
+
             this.requestParams = requestParams;
 
             int startPage = requestIndex/GForum.PAGESIZE;
@@ -62,6 +64,7 @@ public abstract class OverviewBuffer<T extends HOverview, V extends ContentItem>
             hPacket.appendInt(cacheStartPage * GForum.PAGESIZE);
             hPacket.appendInt(amountPages * 2 * GForum.PAGESIZE);
             requestedStartIndex = requestIndex;
+
             gForum.sendToServer(hPacket);
         }
 

@@ -267,7 +267,7 @@ public class GForumController implements Initializable {
     }
 
     public void maybeUpdateRemoteCommentReadMarker() { //sry
-        if (currentForumStats != null && currentForumStats.getUpdateReadMarker() != -1) {
+        if (gForum.isConnectedToGame() && currentForumStats != null && currentForumStats.getUpdateReadMarker() != -1) {
             gForum.getHashSupport().sendToServer(
                     "UpdateForumReadMarkers",
                     (short)1,

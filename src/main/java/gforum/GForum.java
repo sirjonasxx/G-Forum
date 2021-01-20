@@ -323,4 +323,8 @@ public class GForum extends ExtensionForm {
     public AddEntity getAddEntity() {
         return addEntity;
     }
+
+    public boolean isConnectedToGame() {
+        return isConnectedToGame;
+    }
 }
