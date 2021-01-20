@@ -189,6 +189,7 @@ public class GForum extends ExtensionForm {
     protected void onShow() {
         shown = true;
         if (doOnce && isConnectedToGame) {
+            UpdateChecker.check();
             doOnce = false;
             forumOverviewBuffer.request(true, 0, HForumOverviewType.MY_FORUMS.getVal());
         }
