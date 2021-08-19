@@ -1,5 +1,6 @@
 package gforum.entities;
 
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 import gforum.webview.WebUtils;
@@ -154,11 +155,11 @@ public class HComment implements ContentItem {
         int threadId = currentCommentOverview.getThreadId();
         HThread hThread = hThreadOverview.getThreads().stream().filter(hThread1 -> hThread1.getThreadId() == threadId).findFirst().get();
 
-        gForum.getHashSupport().sendToServer("ModerateForumMessage",
+        gForum.sendToServer(new HPacket("ModerateForumMessage", HMessage.Direction.TOSERVER,
                 forum.getGuildId(),
                 hThread.getThreadId(),
                 commentId,
-                state == HThreadState.HIDDEN_BY_ADMIN ? 1 : 10
+                state == HThreadState.HIDDEN_BY_ADMIN ? 1 : 10)
         );
     }
 
@@ -174,13 +175,13 @@ public class HComment implements ContentItem {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK){
-            gForum.getHashSupport().sendToServer(
-                    "ReportForumMessage",
+            gForum.sendToServer(new HPacket(
+                    "ReportForumMessage", HMessage.Direction.TOSERVER,
                     gForum.getController().getCurrentForumStats().gethForum().getGuildId(),
                     hThread.getThreadId(),
                     commentId,
                     22,
-                    "This forum message is against the rules" // xd
+                    "This forum message is against the rules") // xd
             );
         } else {
             // do nothing

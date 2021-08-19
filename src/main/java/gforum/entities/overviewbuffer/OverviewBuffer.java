@@ -58,8 +58,7 @@ public abstract class OverviewBuffer<T extends HOverview, V extends ContentItem>
             int startPage = requestIndex/GForum.PAGESIZE;
             int cacheStartPage = Math.max(startPage - amountPages, 0);
 
-            int headerId = gForum.getHashSupport().getHarbleAPI().getHarbleMessageFromName(HMessage.Direction.TOSERVER, requestPacketName).getHeaderId();
-            HPacket hPacket = new HPacket(headerId);
+            HPacket hPacket = new HPacket(requestPacketName, HMessage.Direction.TOSERVER);
             for (Object param : requestParams) hPacket.appendObject(param);
             hPacket.appendInt(cacheStartPage * GForum.PAGESIZE);
             hPacket.appendInt(amountPages * 2 * GForum.PAGESIZE);

@@ -1,5 +1,6 @@
 package gforum.entities;
 
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 
@@ -91,7 +92,7 @@ public class HThreadOverview implements HOverview {
     @Override
     public void returnClick(GForum gForum) {
         forumStats.setUpdateReadMarker(-1);
-        gForum.getHashSupport().sendToServer("UpdateForumReadMarkers",(short)1,  guildId,  forumStats.gethForum().getLastCommentIndexInForum(), false);
+        gForum.sendToServer(new HPacket("UpdateForumReadMarkers", HMessage.Direction.TOSERVER, (short)1,  guildId,  forumStats.gethForum().getLastCommentIndexInForum(), false));
 
         HForumOverview overview = gForum.getController().getCurrentForumOverview();
         gForum.getForumOverviewBuffer().request(true, overview.getStartIndex(), overview.getViewMode().getVal());

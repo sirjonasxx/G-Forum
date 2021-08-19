@@ -1,5 +1,6 @@
 package gforum.entities;
 
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 import gforum.webview.WebUtils;
@@ -160,11 +161,11 @@ public class HThread implements ContentItem {
     public void stickyClick() {
         if (hasPermissions()) {
             HForum forum = gForum.getController().getCurrentForumStats().gethForum();
-            gForum.getHashSupport().sendToServer("UpdateForumThread",
+            gForum.sendToServer(new HPacket("UpdateForumThread", HMessage.Direction.TOSERVER,
                     forum.getGuildId(),
                     threadId,
                     !isPinned(),
-                    isLocked()
+                    isLocked())
             );
         }
     }
@@ -172,11 +173,11 @@ public class HThread implements ContentItem {
     public void lockClick() {
         if (hasPermissions()) {
             HForum forum = gForum.getController().getCurrentForumStats().gethForum();
-            gForum.getHashSupport().sendToServer("UpdateForumThread",
+            gForum.sendToServer(new HPacket("UpdateForumThread", HMessage.Direction.TOSERVER,
                     forum.getGuildId(),
                     threadId,
                     isPinned(),
-                    !isLocked()
+                    !isLocked())
             );
         }
     }
@@ -184,10 +185,10 @@ public class HThread implements ContentItem {
     public void hideClick() {
         if (hasPermissions()) {
             HForum forum = gForum.getController().getCurrentForumStats().gethForum();
-            gForum.getHashSupport().sendToServer("ModerateForumThread",
+            gForum.sendToServer(new HPacket("ModerateForumThread", HMessage.Direction.TOSERVER,
                     forum.getGuildId(),
                     threadId,
-                    state == HThreadState.HIDDEN_BY_ADMIN ? 1 : 10
+                    state == HThreadState.HIDDEN_BY_ADMIN ? 1 : 10)
             );
         }
     }
@@ -200,12 +201,12 @@ public class HThread implements ContentItem {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK){
-            gForum.getHashSupport().sendToServer(
-                    "ReportForumThread",
+            gForum.sendToServer(new HPacket(
+                    "ReportForumThread", HMessage.Direction.TOSERVER,
                     gForum.getController().getCurrentForumStats().gethForum().getGuildId(),
                     threadId,
                     22,
-                    "This thread is against the rules" // xd
+                    "This thread is against the rules") // xd
             );
         } else {
             // do nothing

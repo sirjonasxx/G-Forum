@@ -1,6 +1,8 @@
 package gforum.add_entity;
 
 import gearth.Main;
+import gearth.protocol.HMessage;
+import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
 import gforum.GForum;
 import gforum.entities.HForum;
@@ -83,12 +85,12 @@ public class AddEntity {
 
         if (!checkErrors(title, message)) {
          latestAttempt = System.currentTimeMillis();
-         gForum.getHashSupport().sendToServer(
-                 "PostForumMessage",
+         gForum.sendToServer(new HPacket(
+                 "PostForumMessage", HMessage.Direction.TOSERVER,
                  currentForum.getGuildId(),
                  currentThread == null ? 0 : currentThread.getThreadId(),
                  currentThread == null ? title : "",
-                 message
+                 message)
          );
 
          updateAddBtnVisibility();

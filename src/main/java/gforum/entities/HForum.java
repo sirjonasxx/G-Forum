@@ -1,5 +1,6 @@
 package gforum.entities;
 
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gforum.GForum;
 import gforum.webview.WebUtils;
@@ -98,7 +99,7 @@ public class HForum implements ContentItem {
 
     private GForum gForum = null;
     public void onClick() {
-        gForum.getHashSupport().sendToServer("GetForumStats", guildId);
+        gForum.sendToServer(new HPacket("GetForumStats", HMessage.Direction.TOSERVER, guildId));
         gForum.getThreadOverviewBuffer().request(true, 0, guildId);
     }
 

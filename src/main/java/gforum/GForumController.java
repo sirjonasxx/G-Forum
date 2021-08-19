@@ -1,5 +1,7 @@
 package gforum;
 
+import gearth.protocol.HMessage;
+import gearth.protocol.HPacket;
 import gforum.entities.*;
 import gforum.webview.WebUtils;
 import javafx.application.Platform;
@@ -268,12 +270,12 @@ public class GForumController implements Initializable {
 
     public void maybeUpdateRemoteCommentReadMarker() { //sry
         if (gForum.isConnectedToGame() && currentForumStats != null && currentForumStats.getUpdateReadMarker() != -1) {
-            gForum.getHashSupport().sendToServer(
-                    "UpdateForumReadMarkers",
+            gForum.sendToServer(new HPacket(
+                    "UpdateForumReadMarkers", HMessage.Direction.TOSERVER,
                     (short)1,
                     currentForumStats.gethForum().getGuildId(),
                     currentForumStats.getUpdateReadMarker(),
-                    false
+                    false)
             );
             currentForumStats.setUpdateReadMarker(-1);
         }

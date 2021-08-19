@@ -2,21 +2,15 @@ package gforum;
 
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
-import gearth.extensions.extra.harble.HashSupport;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.ui.GEarthController;
 import gforum.add_entity.AddEntity;
 import gforum.entities.*;
 import gforum.entities.overviewbuffer.CommentOverviewBuffer;
 import gforum.entities.overviewbuffer.ForumOverviewBuffer;
 import gforum.entities.overviewbuffer.ThreadOverviewBuffer;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -33,45 +27,12 @@ public class GForum extends ExtensionForm {
 
     public Button button;
     private GForumController gForumController;
-    private HashSupport hashSupport = null;
     private Stage primaryStage = null;
     private AddEntity addEntity = null;
 
-    public static void main(String[] args) {
-        runExtensionForm(args, GForum.class);
-    }
-
-    //initialize javaFX elements
-    public void initialize() {
-        button.setText("Click me!");
-    }
-
-    @Override
-    public ExtensionForm launchForm(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(GForum.class.getResource("gforum.fxml"));
-        Parent root = loader.load();
-        this.primaryStage = primaryStage;
-
-//        System.out.println(new File(GForum.class.getResource("gforum.fxml").toURI()).getPath());
-
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("webview/images/logo.png")));
-        primaryStage.setTitle("G-Forum");
-        primaryStage.setMinWidth(420);
-        primaryStage.setMinHeight(500);
-
-        primaryStage.setWidth(550);
-        primaryStage.setHeight(530);
-
-        primaryStage.setScene(new Scene(root));
-        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("/gearth/ui/bootstrap3.css").toExternalForm());
-
-        gForumController = loader.getController();
-        gForumController.setgForum(this);
-
+    public GForum() throws Exception {
         addEntity = new AddEntity(this);
-        return this;
     }
-
 
     private CommentOverviewBuffer commentOverviewBuffer = new CommentOverviewBuffer(this);
     private ThreadOverviewBuffer threadOverviewBuffer = new ThreadOverviewBuffer(this);
@@ -82,19 +43,18 @@ public class GForum extends ExtensionForm {
 
     @Override
     protected void initExtension() {
-        hashSupport = new HashSupport(this);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumsList", this::onForumOverview);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
+        intercept(HMessage.Direction.TOCLIENT, "ForumsList", this::onForumOverview);
+        intercept(HMessage.Direction.TOCLIENT, "ForumThreads", this::onThreadOverview);
+        intercept(HMessage.Direction.TOCLIENT, "ForumThreadMessages", this::onCommentOverview);
+        intercept(HMessage.Direction.TOCLIENT, "ForumStats", this::onForumStats);
 
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumThread", this::onForumThread);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "ForumMessage", this::onForumMessage);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "PostForumThreadOk", this::postForumThreadOk);
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "PostForumMessageOk", this::postForumMessageOk);
+        intercept(HMessage.Direction.TOCLIENT, "ForumThread", this::onForumThread);
+        intercept(HMessage.Direction.TOCLIENT, "ForumMessage", this::onForumMessage);
+        intercept(HMessage.Direction.TOCLIENT, "PostForumThreadOk", this::postForumThreadOk);
+        intercept(HMessage.Direction.TOCLIENT, "PostForumMessageOk", this::postForumMessageOk);
 
 
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "Notification", this::onNotification);
+        intercept(HMessage.Direction.TOCLIENT, "Notification", this::onNotification);
 
         new Thread(() -> {
             while (true) {
@@ -296,11 +256,6 @@ public class GForum extends ExtensionForm {
 
     }
 
-
-    public HashSupport getHashSupport() {
-        return hashSupport;
-    }
-
     public GForumController getController() {
         return gForumController;
     }
@@ -327,5 +282,9 @@ public class GForum extends ExtensionForm {
 
     public boolean isConnectedToGame() {
         return isConnectedToGame;
+    }
+
+    public void setgForumController(GForumController gForumController) {
+        this.gForumController = gForumController;
     }
 }

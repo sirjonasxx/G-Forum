@@ -1,6 +1,5 @@
 package gforum.entities;
 
-import gearth.misc.harble_api.HarbleAPI;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gforum.GForum;
@@ -86,8 +85,7 @@ public class HForumOverview implements HOverview {
 
     @Override
     public void returnClick(GForum gForum) {
-        HarbleAPI.HarbleMessage harbleMessage = gForum.getHashSupport().getHarbleAPI().getHarbleMessageFromName(HMessage.Direction.TOSERVER, "UpdateForumReadMarkers");
-        HPacket markersUpdate = new HPacket(harbleMessage.getHeaderId());
+        HPacket markersUpdate = new HPacket("UpdateForumReadMarkers", HMessage.Direction.TOSERVER);
         List<HForum> readForums = forums.stream().filter(hForum -> hForum.getUnreadComments() > 0).collect(Collectors.toList());
 
         markersUpdate.appendShort((short)readForums.size());
