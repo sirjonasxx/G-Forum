@@ -40,7 +40,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>gforum.GForum</mainClass>
+                            <mainClass>gforum.GForumLauncher</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                             <classpathPrefix>lib/</classpathPrefix>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -65,7 +65,7 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>gforum.GForum</mainClass>
+                            <mainClass>gforum.GForumLauncher</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
